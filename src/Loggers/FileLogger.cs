@@ -8,6 +8,7 @@ public class FileLogger(FileLoggerConfiguration configuration) : IInternalLogger
 {
     private const string DefaultLogFolder = "log";
     private const string FileExtension = ".log";
+    private static readonly Lock s_fileLock = new();
 
     /// <inheritdoc />
     public void Trace(string message, string filePath, string methodName)
@@ -63,7 +64,10 @@ public class FileLogger(FileLoggerConfiguration configuration) : IInternalLogger
 
         CreateDirectoryIfNotExists(path);
 
-        File.AppendAllText(path, LogEntryFactory.Create(level, filePath, methodName, message));
+        lock (s_fileLock)
+        {
+            File.AppendAllText(path, LogEntryFactory.Create(level, filePath, methodName, message));
+        }
     }
 
     private static void CreateDirectoryIfNotExists(string path)

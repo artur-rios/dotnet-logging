@@ -12,11 +12,12 @@
     <Authors>Artur Rios</Authors>
     <Company>Artur Rios</Company>
     <Description>A custom log solution</Description>
-    <PackageTags></PackageTags>
+    <PackageTags>utilities</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/artur-rios/dotnet-logging</RepositoryUrl>
-    <PackageProjectUrl></PackageProjectUrl>
+    <PackageProjectUrl>https://artur-rios.github.io/dotnet-logging</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ArturRios.Extensions" Version="1.0.2" />

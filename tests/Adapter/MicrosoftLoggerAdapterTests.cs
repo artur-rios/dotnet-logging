@@ -61,7 +61,7 @@ public class MicrosoftLoggerAdapterTests
     }
 
     [Fact]
-    public void Should_Log_WithException_CallExceptionThenLevel()
+    public void Should_LogWithException_CallExceptionThenLevel()
     {
         var capturing = new CapturingStateLogger();
         var sp = BuildProvider(capturing, new HttpContextAccessor());
@@ -78,7 +78,7 @@ public class MicrosoftLoggerAdapterTests
     }
 
     [Fact]
-    public void Should_TraceId_Get_WithNoHttpContext_ReturnNull()
+    public void Should_GetTraceIdWithNoHttpContext_ReturnNull()
     {
         var capturing = new CapturingStateLogger();
         var accessor = new HttpContextAccessor { HttpContext = null };
@@ -91,7 +91,7 @@ public class MicrosoftLoggerAdapterTests
     }
 
     [Fact]
-    public void Should_TraceId_Get_WithHttpContextButNoTraceId_ReturnNull()
+    public void Should_GetTraceIdWithHttpContextButNoTraceId_ReturnNull()
     {
         var capturing = new CapturingStateLogger();
         var accessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
@@ -104,7 +104,7 @@ public class MicrosoftLoggerAdapterTests
     }
 
     [Fact]
-    public void Should_TraceId_Get_WithTraceIdInHttpContext_ReturnTraceId()
+    public void Should_GetTraceId_WithTraceIdInHttpContext_ReturnTraceId()
     {
         var capturing = new CapturingStateLogger();
         var accessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
@@ -118,7 +118,7 @@ public class MicrosoftLoggerAdapterTests
     }
 
     [Fact]
-    public void Should_TraceId_Set_WithHttpContext_SetTraceIdInHttpContext()
+    public void Should_SetTraceIdInHttpContext()
     {
         var capturing = new CapturingStateLogger();
         var accessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
@@ -129,7 +129,7 @@ public class MicrosoftLoggerAdapterTests
     }
 
     [Fact]
-    public void Should_TraceId_Set_WithNoHttpContext_NotThrow()
+    public void Should_SetTraceIdWithNoHttpContext_NotThrow()
     {
         var capturing = new CapturingStateLogger();
         var accessor = new HttpContextAccessor { HttpContext = null };
@@ -142,7 +142,7 @@ public class MicrosoftLoggerAdapterTests
     }
 
     [Fact]
-    public void Should_TraceId_SetThenGet_ReturnSetValue()
+    public void Should_SetAndGetTraceId()
     {
         var capturing = new CapturingStateLogger();
         var accessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
