@@ -18,12 +18,17 @@
     <PackageProjectUrl>https://artur-rios.github.io/dotnet-logging</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ArturRios.Extensions" Version="1.0.2" />
     <PackageReference Include="ArturRios.Util" Version="1.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="" />
   </ItemGroup>
 </Project>
 
