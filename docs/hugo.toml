@@ -1,6 +1,6 @@
 baseURL = 'https://artur-rios.github.io/dotnet-logging/'
 languageCode = 'en-us'
-title = 'Dotnet Output'
+title = 'Dotnet Logging'
 theme = 'hugo-theme-re-terminal'
 
 [module]
