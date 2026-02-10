@@ -7,13 +7,13 @@ namespace ArturRios.Logging.Tests.Factories;
 public class InternalLoggerFactoryTests
 {
     [Fact]
-    public void Should_ThrowArgumentNullException_WhenConfigurationIsNull()
+    public void GivenNullConfiguration_WhenCreateCalled_ThenThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() => InternalLoggerFactory.Create(null!));
     }
 
     [Fact]
-    public void Should_CreateConsoleLogger_WhenConsoleLoggerConfigurationIsProvided()
+    public void GivenConsoleLoggerConfiguration_WhenCreateCalled_ThenCreatesConsoleLogger()
     {
         var config = new ConsoleLoggerConfiguration
         {
@@ -27,7 +27,7 @@ public class InternalLoggerFactoryTests
     }
 
     [Fact]
-    public void Should_CreateConsoleLogger_WhenConsoleLoggerConfigurationWithColorsDisabled()
+    public void GivenConsoleLoggerConfigurationWithColorsDisabled_WhenCreateCalled_ThenCreatesConsoleLogger()
     {
         var config = new ConsoleLoggerConfiguration
         {
@@ -41,7 +41,7 @@ public class InternalLoggerFactoryTests
     }
 
     [Fact]
-    public void Should_CreateFileLogger_WhenFileLoggerConfigurationIsProvided()
+    public void GivenFileLoggerConfiguration_WhenCreateCalled_ThenCreatesFileLogger()
     {
         var config = new FileLoggerConfiguration
         {
@@ -57,7 +57,7 @@ public class InternalLoggerFactoryTests
     }
 
     [Fact]
-    public void Should_CreateFileLogger_WhenFileLoggerConfigurationWithCustomPath()
+    public void GivenFileLoggerConfigurationWithCustomPath_WhenCreateCalled_ThenCreatesFileLogger()
     {
         var config = new FileLoggerConfiguration
         {
@@ -76,7 +76,7 @@ public class InternalLoggerFactoryTests
     private sealed class UnknownConfig : LoggerConfiguration;
 
     [Fact]
-    public void Should_ThrowArgumentException_WhenUnsupportedConfigurationTypeIsProvided()
+    public void GivenUnsupportedConfigurationType_WhenCreateCalled_ThenThrowsArgumentException()
     {
         var config = new UnknownConfig();
 

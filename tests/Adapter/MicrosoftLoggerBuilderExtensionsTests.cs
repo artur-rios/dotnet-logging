@@ -7,7 +7,7 @@ namespace ArturRios.Logging.Tests.Adapter;
 public class MicrosoftLoggerBuilderExtensionsTests
 {
     [Fact]
-    public void Should_AddCustomLogger_RegisterLoggerProvider()
+    public void GivenLoggingBuilder_WhenAddCustomLoggerCalled_ThenRegistersLoggerProvider()
     {
         var services = new ServiceCollection();
         services.AddLogging(builder =>
@@ -23,7 +23,7 @@ public class MicrosoftLoggerBuilderExtensionsTests
     }
 
     [Fact]
-    public void Should_AddCustomLogger_RegisterAsSingleton()
+    public void GivenLoggingBuilder_WhenAddCustomLoggerCalled_ThenRegistersAsSingleton()
     {
         var services = new ServiceCollection();
 
@@ -40,7 +40,7 @@ public class MicrosoftLoggerBuilderExtensionsTests
     }
 
     [Fact]
-    public void Should_AddCustomLogger_ReturnBuilderForChaining()
+    public void GivenLoggingBuilder_WhenAddCustomLoggerCalled_ThenReturnsBuilderForChaining()
     {
         var services = new ServiceCollection();
         ILoggingBuilder? capturedBuilder = null;
@@ -57,7 +57,7 @@ public class MicrosoftLoggerBuilderExtensionsTests
     }
 
     [Fact]
-    public void Should_AddCustomLogger_ThrowArgumentNullException_WhenBuilderIsNull()
+    public void GivenNullBuilder_WhenAddCustomLoggerCalled_ThenThrowsArgumentNullException()
     {
         ILoggingBuilder? builder = null;
 
@@ -65,7 +65,7 @@ public class MicrosoftLoggerBuilderExtensionsTests
     }
 
     [Fact]
-    public void Should_AddCustomLogger_AllowMultipleCalls()
+    public void GivenLoggingBuilder_WhenAddCustomLoggerCalledMultipleTimes_ThenAllowsMultipleCalls()
     {
         var services = new ServiceCollection();
         services.AddLogging(builder =>
@@ -81,7 +81,7 @@ public class MicrosoftLoggerBuilderExtensionsTests
     }
 
     [Fact]
-    public void Should_AddCustomLogger_IntegrateWithLoggingPipeline()
+    public void GivenLoggingBuilder_WhenAddCustomLoggerCalled_ThenIntegratesWithLoggingPipeline()
     {
         var services = new ServiceCollection();
         services.AddLogging(builder =>
@@ -98,7 +98,7 @@ public class MicrosoftLoggerBuilderExtensionsTests
     }
 
     [Fact]
-    public void Should_AddCustomLogger_WorkWithOtherLoggerProviders()
+    public void GivenLoggingBuilderWithOtherProviders_WhenAddCustomLoggerCalled_ThenWorksWithOtherLoggerProviders()
     {
         var services = new ServiceCollection();
         services.AddLogging(builder =>
@@ -116,7 +116,7 @@ public class MicrosoftLoggerBuilderExtensionsTests
     }
 
     [Fact]
-    public void Should_AddCustomLogger_PreserveExistingServices()
+    public void GivenServiceCollectionWithExistingServices_WhenAddCustomLoggerCalled_ThenPreservesExistingServices()
     {
         var services = new ServiceCollection();
         services.AddSingleton<TestService>();

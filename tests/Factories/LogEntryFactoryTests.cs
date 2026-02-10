@@ -5,7 +5,7 @@ namespace ArturRios.Logging.Tests.Factories;
 public class LogEntryFactoryTests
 {
     [Fact]
-    public void Should_FormatMessageWithExpectedParts()
+    public void GivenLogEntryFactory_WhenCreateCalled_ThenFormatsMessageWithExpectedParts()
     {
         const CustomLogLevel level = CustomLogLevel.Debug;
         const string filePath = "C:/src/MyClass.cs";

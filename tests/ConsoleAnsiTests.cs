@@ -5,7 +5,7 @@ namespace ArturRios.Logging.Tests;
 public class ConsoleAnsiTests
 {
     [Fact]
-    public void Should_ReturnFalseOnNonWindowsPlatform()
+    public void GivenNonWindowsPlatform_WhenEnableVirtualTerminalProcessingCalled_ThenReturnsFalse()
     {
         // This test verifies the behavior when not on Windows
         // The implementation returns false for non-Windows platforms
@@ -23,7 +23,7 @@ public class ConsoleAnsiTests
     }
 
     [Fact]
-    public void Should_HavePrivatePInvokeMethods()
+    public void GivenConsoleAnsiClass_WhenInspected_ThenHasPrivatePInvokeMethods()
     {
         // Verify that the class has the required P/Invoke method declarations
         var type = typeof(ConsoleAnsi);
@@ -39,7 +39,7 @@ public class ConsoleAnsiTests
     }
 
     [Fact]
-    public void Should_HaveGetStdHandleMethod()
+    public void GivenConsoleAnsiClass_WhenInspected_ThenHasGetStdHandleMethod()
     {
         // Verify GetStdHandle method exists
         var type = typeof(ConsoleAnsi);
@@ -51,7 +51,7 @@ public class ConsoleAnsiTests
     }
 
     [Fact]
-    public void Should_HaveGetConsoleModeMethod()
+    public void GivenConsoleAnsiClass_WhenInspected_ThenHasGetConsoleModeMethod()
     {
         // Verify GetConsoleMode method exists
         var type = typeof(ConsoleAnsi);
@@ -63,7 +63,7 @@ public class ConsoleAnsiTests
     }
 
     [Fact]
-    public void Should_HaveSetConsoleModeMethod()
+    public void GivenConsoleAnsiClass_WhenInspected_ThenHasSetConsoleModeMethod()
     {
         // Verify SetConsoleMode method exists
         var type = typeof(ConsoleAnsi);
@@ -75,7 +75,7 @@ public class ConsoleAnsiTests
     }
 
     [Fact]
-    public void Should_HaveEnableVirtualTerminalProcessingPublicMethod()
+    public void GivenConsoleAnsiClass_WhenInspected_ThenHasEnableVirtualTerminalProcessingPublicMethod()
     {
         // Verify the public method exists with correct signature
         var type = typeof(ConsoleAnsi);
@@ -88,7 +88,7 @@ public class ConsoleAnsiTests
     }
 
     [Fact]
-    public void Should_HaveRequiredConstantsDefinedPrivately()
+    public void GivenConsoleAnsiClass_WhenInspected_ThenHasRequiredConstantsDefinedPrivately()
     {
         // Verify that the class defines required constants
         var type = typeof(ConsoleAnsi);
@@ -103,7 +103,7 @@ public class ConsoleAnsiTests
     }
 
     [Fact]
-    public void Should_DefineCorrectConstantValues()
+    public void GivenConsoleAnsiClass_WhenConstantsInspected_ThenDefinesCorrectConstantValues()
     {
         // Verify the constant values are correct
         var type = typeof(ConsoleAnsi);
@@ -125,7 +125,7 @@ public class ConsoleAnsiTests
     }
 
     [Fact]
-    public void Should_BeStaticClass()
+    public void GivenConsoleAnsiClass_WhenInspected_ThenIsStaticClass()
     {
         // Verify ConsoleAnsi is a static class
         var type = typeof(ConsoleAnsi);
@@ -133,7 +133,7 @@ public class ConsoleAnsiTests
     }
 
     [Fact]
-    public void Should_BeInternalClass()
+    public void GivenConsoleAnsiClass_WhenInspected_ThenIsInternalClass()
     {
         // Verify ConsoleAnsi has internal visibility
         var type = typeof(ConsoleAnsi);
@@ -141,7 +141,7 @@ public class ConsoleAnsiTests
     }
 
     [Fact]
-    public void Should_HaveXmlDocumentationOnPublicMethod()
+    public void GivenConsoleAnsiPublicMethod_WhenInspected_ThenHasXmlDocumentation()
     {
         // Verify that the public method has XML documentation
         var type = typeof(ConsoleAnsi);
@@ -157,7 +157,7 @@ public class ConsoleAnsiTests
     }
 
     [Fact]
-    public void Should_CallEnableVirtualTerminalProcessingWithoutThrowingException()
+    public void GivenConsoleAnsi_WhenEnableVirtualTerminalProcessingCalled_ThenDoesNotThrowException()
     {
         // Basic integration test - ensure the method can be called without throwing
         // Note: Actual behavior depends on the OS and console state

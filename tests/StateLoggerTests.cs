@@ -33,7 +33,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Trace_UseUnknown_WhenStateIsNull()
+    public void GivenStateLoggerWithNullState_WhenTraceLogged_ThenUsesUnknownCallerInfo()
     {
         var logger = new TestStateLogger();
         logger.Trace("hello");
@@ -44,7 +44,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Debug_ReadCallerInfo_FromStatePairs()
+    public void GivenStateLoggerWithCallerStatePairs_WhenDebugLogged_ThenReadsCallerInfo()
     {
         var logger = new TestStateLogger();
         var state = new[]
@@ -61,7 +61,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Exception_LogException_ToStringAndPrefixTraceId()
+    public void GivenStateLoggerWithTraceId_WhenExceptionLogged_ThenLogsToStringAndPrefixesTraceId()
     {
         var logger = new TestStateLogger { TraceId = "t1" };
         var ex = new InvalidOperationException("boom");
@@ -74,7 +74,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Info_ReadCallerInfo_FromState()
+    public void GivenStateLoggerWithCallerState_WhenInfoLogged_ThenReadsCallerInfo()
     {
         var logger = new TestStateLogger();
         var state = new[]
@@ -94,7 +94,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Info_UseUnknown_WhenStateIsNull()
+    public void GivenStateLoggerWithNullState_WhenInfoLogged_ThenUsesUnknownCallerInfo()
     {
         var logger = new TestStateLogger();
 
@@ -107,7 +107,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Info_PrefixTraceId_WhenPresent()
+    public void GivenStateLoggerWithTraceId_WhenInfoLogged_ThenPrefixesTraceId()
     {
         var logger = new TestStateLogger { TraceId = "info-trace" };
 
@@ -119,7 +119,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Warn_ReadCallerInfo_FromState()
+    public void GivenStateLoggerWithCallerState_WhenWarnLogged_ThenReadsCallerInfo()
     {
         var logger = new TestStateLogger();
         var state = new[]
@@ -139,7 +139,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Warn_UseUnknown_WhenStateIsNull()
+    public void GivenStateLoggerWithNullState_WhenWarnLogged_ThenUsesUnknownCallerInfo()
     {
         var logger = new TestStateLogger();
 
@@ -152,7 +152,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Warn_PrefixTraceId_WhenPresent()
+    public void GivenStateLoggerWithTraceId_WhenWarnLogged_ThenPrefixesTraceId()
     {
         var logger = new TestStateLogger { TraceId = "warn-trace" };
 
@@ -164,7 +164,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Error_ReadCallerInfo_FromState()
+    public void GivenStateLoggerWithCallerState_WhenErrorLogged_ThenReadsCallerInfo()
     {
         var logger = new TestStateLogger();
         var state = new[]
@@ -184,7 +184,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Error_UseUnknown_WhenStateIsNull()
+    public void GivenStateLoggerWithNullState_WhenErrorLogged_ThenUsesUnknownCallerInfo()
     {
         var logger = new TestStateLogger();
 
@@ -197,7 +197,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Error_PrefixTraceId_WhenPresent()
+    public void GivenStateLoggerWithTraceId_WhenErrorLogged_ThenPrefixesTraceId()
     {
         var logger = new TestStateLogger { TraceId = "error-trace" };
 
@@ -209,7 +209,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Critical_ReadCallerInfo_FromState()
+    public void GivenStateLoggerWithCallerState_WhenCriticalLogged_ThenReadsCallerInfo()
     {
         var logger = new TestStateLogger();
         var state = new[]
@@ -229,7 +229,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Critical_UseUnknown_WhenStateIsNull()
+    public void GivenStateLoggerWithNullState_WhenCriticalLogged_ThenUsesUnknownCallerInfo()
     {
         var logger = new TestStateLogger();
 
@@ -242,7 +242,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Critical_PrefixTraceId_WhenPresent()
+    public void GivenStateLoggerWithTraceId_WhenCriticalLogged_ThenPrefixesTraceId()
     {
         var logger = new TestStateLogger { TraceId = "critical-trace" };
 
@@ -254,7 +254,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Fatal_ReadCallerInfo_FromState()
+    public void GivenStateLoggerWithCallerState_WhenFatalLogged_ThenReadsCallerInfo()
     {
         var logger = new TestStateLogger();
         var state = new[]
@@ -274,7 +274,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Fatal_UseUnknown_WhenStateIsNull()
+    public void GivenStateLoggerWithNullState_WhenFatalLogged_ThenUsesUnknownCallerInfo()
     {
         var logger = new TestStateLogger();
 
@@ -287,7 +287,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Fatal_PrefixTraceId_WhenPresent()
+    public void GivenStateLoggerWithTraceId_WhenFatalLogged_ThenPrefixesTraceId()
     {
         var logger = new TestStateLogger { TraceId = "fatal-trace" };
 
@@ -299,7 +299,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Trace_UseUnknown_WhenStateIsNotEnumerable()
+    public void GivenStateLoggerWithNonEnumerableState_WhenTraceLogged_ThenUsesUnknownCallerInfo()
     {
         var logger = new TestStateLogger();
 
@@ -312,7 +312,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Debug_ReadCallerInfo_UsingFilePath()
+    public void GivenStateLoggerWithFilePathAlternateProperty_WhenDebugLogged_ThenReadsCallerInfo()
     {
         var logger = new TestStateLogger();
         var state = new[]
@@ -330,7 +330,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Debug_ReadCallerInfo_UsingLowercaseNames()
+    public void GivenStateLoggerWithLowercasePropertyNames_WhenDebugLogged_ThenReadsCallerInfo()
     {
         var logger = new TestStateLogger();
         var state = new[]
@@ -348,7 +348,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Debug_ReadCallerInfo_UsingMethodProperty()
+    public void GivenStateLoggerWithMethodProperty_WhenDebugLogged_ThenReadsMethodFromAlternateProperty()
     {
         var logger = new TestStateLogger();
         var state = new[]
@@ -365,7 +365,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Trace_IgnoreNullValues_InState()
+    public void GivenStateLoggerWithNullPropertyValues_WhenTraceLogged_ThenIgnoresNullValues()
     {
         var logger = new TestStateLogger();
         var state = new[]
@@ -383,7 +383,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Info_StopProcessing_WhenBothPropertiesFound()
+    public void GivenStateLoggerWithDuplicateProperties_WhenInfoLogged_ThenStopsProcessingWhenBothFound()
     {
         var logger = new TestStateLogger();
         var state = new[]
@@ -403,7 +403,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Exception_UseExceptionToString_WhenAvailable()
+    public void GivenStateLoggerWithException_WhenExceptionLogged_ThenUsesExceptionToString()
     {
         var logger = new TestStateLogger();
         var ex = new InvalidOperationException("message");
@@ -417,7 +417,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_Exception_NotPrefixTraceId_WhenNull()
+    public void GivenStateLoggerWithNullTraceId_WhenExceptionLogged_ThenDoesNotPrefixTraceId()
     {
         var logger = new TestStateLogger { TraceId = null };
         var ex = new Exception("test");
@@ -430,7 +430,7 @@ public class StateLoggerTests
     }
 
     [Fact]
-    public void Should_ForwardToAllConfiguredLoggers()
+    public void GivenStateLoggerWithMultipleInternalLoggers_WhenInfoLogged_ThenForwardsToAllConfiguredLoggers()
     {
         var logger = new TestStateLogger();
         var dummy2 = new DummyInternalLogger2();

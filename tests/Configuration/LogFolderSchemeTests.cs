@@ -5,7 +5,7 @@ namespace ArturRios.Logging.Tests.Configuration;
 public class LogFolderSchemeTests
 {
     [Fact]
-    public void Should_HaveExpectedNumericValues()
+    public void GivenLogFolderSchemeEnum_WhenInspected_ThenHasExpectedNumericValues()
     {
         Assert.Equal(0, (int)LogFolderScheme.AllInOne);
         Assert.Equal(1, (int)LogFolderScheme.ByYear);
@@ -16,7 +16,7 @@ public class LogFolderSchemeTests
     }
 
     [Fact]
-    public void Should_HaveExpectedNames()
+    public void GivenLogFolderSchemeEnum_WhenInspected_ThenHasExpectedNames()
     {
         Assert.Equal("AllInOne", nameof(LogFolderScheme.AllInOne));
         Assert.Equal("ByYear", nameof(LogFolderScheme.ByYear));

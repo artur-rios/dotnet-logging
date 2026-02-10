@@ -54,7 +54,7 @@ public class StandaloneLoggerTests
     }
 
     [Fact]
-    public void Should_ForwardToInternalLoggerAndPreserveCallerInfo()
+    public void GivenStandaloneLoggerWithCallerInfo_WhenTraceLogged_ThenForwardsToInternalLoggerAndPreservesCallerInfo()
     {
         var logger = new TestStandaloneLogger();
 
@@ -71,7 +71,7 @@ public class StandaloneLoggerTests
     }
 
     [Fact]
-    public void Should_PrefixTraceId_WhenPresent()
+    public void GivenStandaloneLoggerWithTraceId_WhenInfoLogged_ThenPrefixesTraceId()
     {
         var logger = new TestStandaloneLogger { TraceId = "abc" };
 
@@ -84,7 +84,7 @@ public class StandaloneLoggerTests
     }
 
     [Fact]
-    public void Should_Debug_ForwardToInternalLogger()
+    public void GivenStandaloneLoggerWithCallerInfo_WhenDebugLogged_ThenForwardsToInternalLogger()
     {
         var logger = new TestStandaloneLogger();
 
@@ -99,7 +99,7 @@ public class StandaloneLoggerTests
     }
 
     [Fact]
-    public void Should_Debug_PrefixTraceId_WhenPresent()
+    public void GivenStandaloneLoggerWithTraceId_WhenDebugLogged_ThenPrefixesTraceId()
     {
         var logger = new TestStandaloneLogger { TraceId = "trace123" };
 
@@ -111,7 +111,7 @@ public class StandaloneLoggerTests
     }
 
     [Fact]
-    public void Should_Warn_ForwardToInternalLogger()
+    public void GivenStandaloneLoggerWithCallerInfo_WhenWarnLogged_ThenForwardsToInternalLogger()
     {
         var logger = new TestStandaloneLogger();
 
@@ -126,7 +126,7 @@ public class StandaloneLoggerTests
     }
 
     [Fact]
-    public void Should_Warn_PrefixTraceId_WhenPresent()
+    public void GivenStandaloneLoggerWithTraceId_WhenWarnLogged_ThenPrefixesTraceId()
     {
         var logger = new TestStandaloneLogger { TraceId = "warn-trace" };
 
@@ -138,7 +138,7 @@ public class StandaloneLoggerTests
     }
 
     [Fact]
-    public void Should_Error_ForwardToInternalLogger()
+    public void GivenStandaloneLoggerWithCallerInfo_WhenErrorLogged_ThenForwardsToInternalLogger()
     {
         var logger = new TestStandaloneLogger();
 
@@ -153,7 +153,7 @@ public class StandaloneLoggerTests
     }
 
     [Fact]
-    public void Should_Error_PrefixTraceId_WhenPresent()
+    public void GivenStandaloneLoggerWithTraceId_WhenErrorLogged_ThenPrefixesTraceId()
     {
         var logger = new TestStandaloneLogger { TraceId = "err-trace" };
 
@@ -165,7 +165,7 @@ public class StandaloneLoggerTests
     }
 
     [Fact]
-    public void Should_Exception_LogExceptionMessage()
+    public void GivenStandaloneLoggerWithException_WhenExceptionLogged_ThenLogsExceptionMessage()
     {
         var logger = new TestStandaloneLogger();
         var ex = new InvalidOperationException("something went wrong");
@@ -181,7 +181,7 @@ public class StandaloneLoggerTests
     }
 
     [Fact]
-    public void Should_Exception_PrefixTraceId_WhenPresent()
+    public void GivenStandaloneLoggerWithTraceIdAndException_WhenExceptionLogged_ThenPrefixesTraceId()
     {
         var logger = new TestStandaloneLogger { TraceId = "exc-trace" };
         var ex = new ArgumentException("invalid arg");
@@ -194,7 +194,7 @@ public class StandaloneLoggerTests
     }
 
     [Fact]
-    public void Should_Critical_ForwardToInternalLogger()
+    public void GivenStandaloneLoggerWithCallerInfo_WhenCriticalLogged_ThenForwardsToInternalLogger()
     {
         var logger = new TestStandaloneLogger();
 
@@ -209,7 +209,7 @@ public class StandaloneLoggerTests
     }
 
     [Fact]
-    public void Should_Critical_PrefixTraceId_WhenPresent()
+    public void GivenStandaloneLoggerWithTraceId_WhenCriticalLogged_ThenPrefixesTraceId()
     {
         var logger = new TestStandaloneLogger { TraceId = "crit-trace" };
 
@@ -221,7 +221,7 @@ public class StandaloneLoggerTests
     }
 
     [Fact]
-    public void Should_Fatal_ForwardToInternalLogger()
+    public void GivenStandaloneLoggerWithCallerInfo_WhenFatalLogged_ThenForwardsToInternalLogger()
     {
         var logger = new TestStandaloneLogger();
 
@@ -236,7 +236,7 @@ public class StandaloneLoggerTests
     }
 
     [Fact]
-    public void Should_Fatal_PrefixTraceId_WhenPresent()
+    public void GivenStandaloneLoggerWithTraceId_WhenFatalLogged_ThenPrefixesTraceId()
     {
         var logger = new TestStandaloneLogger { TraceId = "fatal-trace" };
 
@@ -248,7 +248,7 @@ public class StandaloneLoggerTests
     }
 
     [Fact]
-    public void Should_Trace_NotPrefixTraceId_WhenNull()
+    public void GivenStandaloneLoggerWithNullTraceId_WhenTraceLogged_ThenDoesNotPrefixTraceId()
     {
         var logger = new TestStandaloneLogger { TraceId = null };
 
@@ -261,7 +261,7 @@ public class StandaloneLoggerTests
     }
 
     [Fact]
-    public void Should_Trace_NotPrefixTraceId_WhenEmpty()
+    public void GivenStandaloneLoggerWithEmptyTraceId_WhenTraceLogged_ThenDoesNotPrefixTraceId()
     {
         var logger = new TestStandaloneLogger { TraceId = "" };
 
@@ -274,7 +274,7 @@ public class StandaloneLoggerTests
     }
 
     [Fact]
-    public void Should_ForwardToAllConfiguredLoggers()
+    public void GivenStandaloneLoggerWithMultipleInternalLoggers_WhenInfoLogged_ThenForwardsToAllConfiguredLoggers()
     {
         // Need to create a logger with multiple internal loggers
         var logger = new TestStandaloneLogger();
@@ -292,7 +292,7 @@ public class StandaloneLoggerTests
     }
 
     [Fact]
-    public void Should_UseCallerInfo()
+    public void GivenStandaloneLogger_WhenTraceLoggedWithoutExplicitCaller_ThenUsesCallerInfo()
     {
         var logger = new TestStandaloneLogger();
 
@@ -301,6 +301,6 @@ public class StandaloneLoggerTests
         var call = Assert.Single(logger.Dummy.Calls);
 
         Assert.EndsWith("StandaloneLoggerTests.cs", call.File);
-        Assert.Equal("Should_UseCallerInfo", call.Method);
+        Assert.Equal("GivenStandaloneLogger_WhenTraceLoggedWithoutExplicitCaller_ThenUsesCallerInfo", call.Method);
     }
 }

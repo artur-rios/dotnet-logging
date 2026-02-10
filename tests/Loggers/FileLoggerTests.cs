@@ -32,7 +32,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_ImplementIInternalLogger()
+    public void GivenFileLogger_WhenCreated_ThenImplementsIInternalLogger()
     {
         var logger = new FileLogger(_configuration);
 
@@ -40,7 +40,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_AcceptFileLoggerConfigurationInConstructor()
+    public void GivenFileLoggerConfiguration_WhenFileLoggerCreated_ThenAcceptsConfiguration()
     {
         var config = new FileLoggerConfiguration
         {
@@ -53,7 +53,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_HaveTraceMethod()
+    public void GivenFileLogger_WhenInspected_ThenHasTraceMethod()
     {
         var logger = new FileLogger(_configuration);
 
@@ -61,7 +61,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_HaveDebugMethod()
+    public void GivenFileLogger_WhenInspected_ThenHasDebugMethod()
     {
         var logger = new FileLogger(_configuration);
 
@@ -69,7 +69,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_HaveInfoMethod()
+    public void GivenFileLogger_WhenInspected_ThenHasInfoMethod()
     {
         var logger = new FileLogger(_configuration);
 
@@ -77,7 +77,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_HaveWarnMethod()
+    public void GivenFileLogger_WhenInspected_ThenHasWarnMethod()
     {
         var logger = new FileLogger(_configuration);
 
@@ -85,7 +85,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_HaveErrorMethod()
+    public void GivenFileLogger_WhenInspected_ThenHasErrorMethod()
     {
         var logger = new FileLogger(_configuration);
 
@@ -93,7 +93,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_HaveExceptionMethod()
+    public void GivenFileLogger_WhenInspected_ThenHasExceptionMethod()
     {
         var logger = new FileLogger(_configuration);
 
@@ -101,7 +101,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_HaveCriticalMethod()
+    public void GivenFileLogger_WhenInspected_ThenHasCriticalMethod()
     {
         var logger = new FileLogger(_configuration);
 
@@ -109,7 +109,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_HaveFatalMethod()
+    public void GivenFileLogger_WhenInspected_ThenHasFatalMethod()
     {
         var logger = new FileLogger(_configuration);
 
@@ -117,7 +117,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_WriteTraceToFile()
+    public void GivenFileLogger_WhenTraceLogged_ThenWritesToFile()
     {
         var logger = new FileLogger(_configuration);
         logger.Trace("Trace message", "Program.cs", "Main");
@@ -130,7 +130,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_WriteDebugToFile()
+    public void GivenFileLogger_WhenDebugLogged_ThenWritesToFile()
     {
         var logger = new FileLogger(_configuration);
         logger.Debug("Debug message", "Program.cs", "Main");
@@ -143,7 +143,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_WriteInfoToFile()
+    public void GivenFileLogger_WhenInfoLogged_ThenWritesToFile()
     {
         var logger = new FileLogger(_configuration);
         logger.Info("Info message", "Program.cs", "Main");
@@ -156,7 +156,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_WriteWarnToFile()
+    public void GivenFileLogger_WhenWarnLogged_ThenWritesToFile()
     {
         var logger = new FileLogger(_configuration);
         logger.Warn("Warning message", "Program.cs", "Main");
@@ -169,7 +169,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_WriteErrorToFile()
+    public void GivenFileLogger_WhenErrorLogged_ThenWritesToFile()
     {
         var logger = new FileLogger(_configuration);
         logger.Error("Error message", "Program.cs", "Main");
@@ -182,7 +182,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_WriteExceptionToFile()
+    public void GivenFileLogger_WhenExceptionLogged_ThenWritesToFile()
     {
         var logger = new FileLogger(_configuration);
         logger.Exception("Exception message", "Program.cs", "Main");
@@ -195,7 +195,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_WriteCriticalToFile()
+    public void GivenFileLogger_WhenCriticalLogged_ThenWritesToFile()
     {
         var logger = new FileLogger(_configuration);
         logger.Critical("Critical message", "Program.cs", "Main");
@@ -208,7 +208,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_WriteFatalToFile()
+    public void GivenFileLogger_WhenFatalLogged_ThenWritesToFile()
     {
         var logger = new FileLogger(_configuration);
         logger.Fatal("Fatal message", "Program.cs", "Main");
@@ -221,7 +221,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_CreateLogDirectoryIfNotExists()
+    public void GivenFileLoggerWithNonExistentDirectory_WhenInfoLogged_ThenCreatesLogDirectory()
     {
         Assert.False(Directory.Exists(_testLogDirectory));
 
@@ -232,7 +232,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_AppendToExistingLogFile()
+    public void GivenFileLoggerWithExistingLog_WhenMultipleMessagesLogged_ThenAppendsToExistingLogFile()
     {
         var logger = new FileLogger(_configuration);
         logger.Info("First message", "Program.cs", "Main");
@@ -247,7 +247,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_SupportAllInOneFolderScheme()
+    public void GivenFileLoggerWithAllInOneFolderScheme_WhenInfoLogged_ThenSupportsAllInOneFolderScheme()
     {
         var config = new FileLoggerConfiguration
         {
@@ -270,7 +270,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_SupportByYearFolderScheme()
+    public void GivenFileLoggerWithByYearFolderScheme_WhenInfoLogged_ThenSupportsByYearFolderScheme()
     {
         var config = new FileLoggerConfiguration
         {
@@ -291,7 +291,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_SupportByMonthFolderScheme()
+    public void GivenFileLoggerWithByMonthFolderScheme_WhenInfoLogged_ThenSupportsByMonthFolderScheme()
     {
         var config = new FileLoggerConfiguration
         {
@@ -312,7 +312,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_SupportByDayFolderScheme()
+    public void GivenFileLoggerWithByDayFolderScheme_WhenInfoLogged_ThenSupportsByDayFolderScheme()
     {
         var config = new FileLoggerConfiguration
         {
@@ -333,7 +333,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_SupportByHourFolderScheme()
+    public void GivenFileLoggerWithByHourFolderScheme_WhenInfoLogged_ThenSupportsByHourFolderScheme()
     {
         var config = new FileLoggerConfiguration
         {
@@ -354,7 +354,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_SupportByRequestFolderScheme()
+    public void GivenFileLoggerWithByRequestFolderScheme_WhenMultipleMessagesLogged_ThenSupportsByRequestFolderScheme()
     {
         var config = new FileLoggerConfiguration
         {
@@ -373,7 +373,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_SupportRequestFileSplitLevel()
+    public void GivenFileLoggerWithRequestFileSplitLevel_WhenInfoLogged_ThenSupportsRequestFileSplitLevel()
     {
         var config = new FileLoggerConfiguration
         {
@@ -393,7 +393,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_SupportYearFileSplitLevel()
+    public void GivenFileLoggerWithYearFileSplitLevel_WhenInfoLogged_ThenSupportsYearFileSplitLevel()
     {
         var config = new FileLoggerConfiguration
         {
@@ -414,7 +414,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_SupportMonthFileSplitLevel()
+    public void GivenFileLoggerWithMonthFileSplitLevel_WhenInfoLogged_ThenSupportsMonthFileSplitLevel()
     {
         var config = new FileLoggerConfiguration
         {
@@ -435,7 +435,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_SupportDayFileSplitLevel()
+    public void GivenFileLoggerWithDayFileSplitLevel_WhenInfoLogged_ThenSupportsDayFileSplitLevel()
     {
         var config = new FileLoggerConfiguration
         {
@@ -456,7 +456,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_SupportHourFileSplitLevel()
+    public void GivenFileLoggerWithHourFileSplitLevel_WhenInfoLogged_ThenSupportsHourFileSplitLevel()
     {
         var config = new FileLoggerConfiguration
         {
@@ -477,7 +477,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_UseDefaultLogFolderWhenFilePathIsNull()
+    public void GivenFileLoggerWithNullFilePath_WhenInfoLogged_ThenUsesDefaultLogFolder()
     {
         var config = new FileLoggerConfiguration
         {
@@ -502,7 +502,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_HandleMultipleConsecutiveLoggingCalls()
+    public void GivenFileLogger_WhenMultipleConsecutiveCallsMade_ThenHandlesMultipleConsecutiveLoggingCalls()
     {
         var logger = new FileLogger(_configuration);
 
@@ -518,7 +518,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_HandleEmptyMessage()
+    public void GivenFileLoggerWithEmptyMessage_WhenInfoLogged_ThenHandlesEmptyMessage()
     {
         var logger = new FileLogger(_configuration);
 
@@ -530,7 +530,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_AllowLoggingWithSpecialCharacters()
+    public void GivenFileLoggerWithSpecialCharacters_WhenInfoLogged_ThenAllowsLoggingWithSpecialCharacters()
     {
         var logger = new FileLogger(_configuration);
 
@@ -542,7 +542,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_AllowLoggingWithUnicodeCharacters()
+    public void GivenFileLoggerWithUnicodeCharacters_WhenInfoLogged_ThenAllowsLoggingWithUnicodeCharacters()
     {
         var logger = new FileLogger(_configuration);
 
@@ -554,7 +554,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_AllowLoggingWithLongMessage()
+    public void GivenFileLoggerWithLongMessage_WhenInfoLogged_ThenAllowsLoggingWithLongMessage()
     {
         var logger = new FileLogger(_configuration);
         var longMessage = string.Concat(Enumerable.Repeat("This is a very long message. ", 100));
@@ -567,7 +567,7 @@ public class FileLoggerTests : IDisposable
     }
 
     [Fact]
-    public void Should_BeThreadSafe()
+    public void GivenFileLoggerWithConcurrentCalls_WhenMultipleThreadsLog_ThenIsThreadSafe()
     {
         var logger = new FileLogger(_configuration);
         var tasks = new List<Task>();

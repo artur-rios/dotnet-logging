@@ -5,7 +5,7 @@ namespace ArturRios.Logging.Tests.Configuration;
 public class LogSplitLevelTests
 {
     [Fact]
-    public void Should_HaveExpectedNumericValues()
+    public void GivenLogSplitLevelEnum_WhenInspected_ThenHasExpectedNumericValues()
     {
         Assert.Equal(0, (int)LogSplitLevel.Request);
         Assert.Equal(1, (int)LogSplitLevel.Hour);
@@ -15,7 +15,7 @@ public class LogSplitLevelTests
     }
 
     [Fact]
-    public void Should_HaveExpectedNames()
+    public void GivenLogSplitLevelEnum_WhenInspected_ThenHasExpectedNames()
     {
         Assert.Equal("Request", nameof(LogSplitLevel.Request));
         Assert.Equal("Hour", nameof(LogSplitLevel.Hour));

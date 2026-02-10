@@ -5,7 +5,7 @@ namespace ArturRios.Logging.Tests.Configuration;
 public class FileLoggerConfigurationTests
 {
     [Fact]
-    public void Should_SetDefaultValues()
+    public void GivenFileLoggerConfiguration_WhenCreated_ThenSetsDefaultValues()
     {
         var config = new FileLoggerConfiguration
         {

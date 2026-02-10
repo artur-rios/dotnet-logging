@@ -1,4 +1,4 @@
-﻿using ArturRios.Logging.Configuration;
+﻿﻿using ArturRios.Logging.Configuration;
 using ArturRios.Logging.Interfaces;
 using ArturRios.Logging.Loggers;
 
@@ -9,14 +9,14 @@ public class ConsoleLoggerTests
     private readonly ConsoleLoggerConfiguration _configuration = new() { UseColors = false };
 
     [Fact]
-    public void Should_ImplementIInternalLogger()
+    public void GivenConsoleLogger_WhenCreated_ThenImplementsIInternalLogger()
     {
         var logger = new ConsoleLogger(_configuration);
         Assert.IsType<IInternalLogger>(logger, exactMatch: false);
     }
 
     [Fact]
-    public void Should_AcceptConsoleLoggerConfigurationInConstructor()
+    public void GivenConsoleLoggerConfiguration_WhenConsoleLoggerCreated_ThenAcceptsConfiguration()
     {
         var config = new ConsoleLoggerConfiguration { UseColors = true };
         var logger = new ConsoleLogger(config);
@@ -25,7 +25,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_HaveTraceMethod()
+    public void GivenConsoleLogger_WhenInspected_ThenHasTraceMethod()
     {
         var logger = new ConsoleLogger(_configuration);
 
@@ -33,7 +33,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_HaveDebugMethod()
+    public void GivenConsoleLogger_WhenInspected_ThenHasDebugMethod()
     {
         var logger = new ConsoleLogger(_configuration);
 
@@ -41,7 +41,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_HaveInfoMethod()
+    public void GivenConsoleLogger_WhenInspected_ThenHasInfoMethod()
     {
         var logger = new ConsoleLogger(_configuration);
 
@@ -49,7 +49,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_HaveWarnMethod()
+    public void GivenConsoleLogger_WhenInspected_ThenHasWarnMethod()
     {
         var logger = new ConsoleLogger(_configuration);
 
@@ -57,7 +57,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_HaveErrorMethod()
+    public void GivenConsoleLogger_WhenInspected_ThenHasErrorMethod()
     {
         var logger = new ConsoleLogger(_configuration);
 
@@ -65,7 +65,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_HaveExceptionMethod()
+    public void GivenConsoleLogger_WhenInspected_ThenHasExceptionMethod()
     {
         var logger = new ConsoleLogger(_configuration);
 
@@ -73,7 +73,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_HaveCriticalMethod()
+    public void GivenConsoleLogger_WhenInspected_ThenHasCriticalMethod()
     {
         var logger = new ConsoleLogger(_configuration);
 
@@ -81,7 +81,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_HaveFatalMethod()
+    public void GivenConsoleLogger_WhenInspected_ThenHasFatalMethod()
     {
         var logger = new ConsoleLogger(_configuration);
 
@@ -89,7 +89,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_WriteTraceWithoutException()
+    public void GivenConsoleLogger_WhenTraceLogged_ThenWritesWithoutException()
     {
         var logger = new ConsoleLogger(_configuration);
         var exception = Record.Exception(() =>
@@ -100,7 +100,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_WriteDebugWithoutException()
+    public void GivenConsoleLogger_WhenDebugLogged_ThenWritesWithoutException()
     {
         var logger = new ConsoleLogger(_configuration);
         var exception = Record.Exception(() =>
@@ -111,7 +111,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_WriteInfoWithoutException()
+    public void GivenConsoleLogger_WhenInfoLogged_ThenWritesWithoutException()
     {
         var logger = new ConsoleLogger(_configuration);
         var exception = Record.Exception(() =>
@@ -122,7 +122,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_WriteWarnWithoutException()
+    public void GivenConsoleLogger_WhenWarnLogged_ThenWritesWithoutException()
     {
         var logger = new ConsoleLogger(_configuration);
         var exception = Record.Exception(() =>
@@ -133,7 +133,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_WriteErrorWithoutException()
+    public void GivenConsoleLogger_WhenErrorLogged_ThenWritesWithoutException()
     {
         var logger = new ConsoleLogger(_configuration);
         var exception = Record.Exception(() =>
@@ -144,7 +144,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_WriteExceptionWithoutException()
+    public void GivenConsoleLogger_WhenExceptionLogged_ThenWritesWithoutException()
     {
         var logger = new ConsoleLogger(_configuration);
         var exception = Record.Exception(() =>
@@ -155,7 +155,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_WriteCriticalWithoutException()
+    public void GivenConsoleLogger_WhenCriticalLogged_ThenWritesWithoutException()
     {
         var logger = new ConsoleLogger(_configuration);
         var exception = Record.Exception(() =>
@@ -166,7 +166,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_WriteFatalWithoutException()
+    public void GivenConsoleLogger_WhenFatalLogged_ThenWritesWithoutException()
     {
         var logger = new ConsoleLogger(_configuration);
         var exception = Record.Exception(() =>
@@ -177,7 +177,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_SupportColoredOutput()
+    public void GivenConsoleLoggerWithColorsEnabled_WhenInfoLogged_ThenSupportsColoredOutput()
     {
         var configWithColors = new ConsoleLoggerConfiguration { UseColors = true };
         var loggerWithColors = new ConsoleLogger(configWithColors);
@@ -190,7 +190,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_SupportNonColoredOutput()
+    public void GivenConsoleLoggerWithColorsDisabled_WhenInfoLogged_ThenSupportsNonColoredOutput()
     {
         var configWithoutColors = new ConsoleLoggerConfiguration { UseColors = false };
         var loggerWithoutColors = new ConsoleLogger(configWithoutColors);
@@ -203,7 +203,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_HandleEmptyMessage()
+    public void GivenConsoleLoggerWithEmptyMessage_WhenInfoLogged_ThenHandlesEmptyMessage()
     {
         var logger = new ConsoleLogger(_configuration);
 
@@ -215,7 +215,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_HandleNullMessage()
+    public void GivenConsoleLoggerWithNullMessage_WhenInfoLogged_ThenHandlesNullMessage()
     {
         var logger = new ConsoleLogger(_configuration);
 
@@ -230,7 +230,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_HandleMultipleConsecutiveLoggingCalls()
+    public void GivenConsoleLogger_WhenMultipleConsecutiveCallsMade_ThenHandlesMultipleConsecutiveLoggingCalls()
     {
         var logger = new ConsoleLogger(_configuration);
 
@@ -246,7 +246,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_AllowLoggingWithSpecialCharacters()
+    public void GivenConsoleLoggerWithSpecialCharacters_WhenInfoLogged_ThenAllowsLoggingWithSpecialCharacters()
     {
         var logger = new ConsoleLogger(_configuration);
 
@@ -258,7 +258,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_AllowLoggingWithUnicodeCharacters()
+    public void GivenConsoleLoggerWithUnicodeCharacters_WhenInfoLogged_ThenAllowsLoggingWithUnicodeCharacters()
     {
         var logger = new ConsoleLogger(_configuration);
 
@@ -270,7 +270,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_AllowLoggingWithLongMessage()
+    public void GivenConsoleLoggerWithLongMessage_WhenInfoLogged_ThenAllowsLoggingWithLongMessage()
     {
         var logger = new ConsoleLogger(_configuration);
         var longMessage = string.Concat(Enumerable.Repeat("This is a very long message. ", 100));
@@ -283,7 +283,7 @@ public class ConsoleLoggerTests
     }
 
     [Fact]
-    public void Should_BeThreadSafe()
+    public void GivenConsoleLoggerWithConcurrentCalls_WhenMultipleThreadsLog_ThenIsThreadSafe()
     {
         var logger = new ConsoleLogger(_configuration);
         var tasks = new List<Task>();

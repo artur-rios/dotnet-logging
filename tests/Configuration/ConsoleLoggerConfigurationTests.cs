@@ -5,7 +5,7 @@ namespace ArturRios.Logging.Tests.Configuration;
 public class ConsoleLoggerConfigurationTests
 {
     [Fact]
-    public void Should_UseColorsAsDefault()
+    public void GivenConsoleLoggerConfiguration_WhenCreated_ThenUsesColorsAsDefault()
     {
         var config = new ConsoleLoggerConfiguration();
 

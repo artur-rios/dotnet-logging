@@ -22,7 +22,7 @@ public class MicrosoftLoggerAdapterTests
     }
 
     [Fact]
-    public void Should_ForwardToStateLoggerWithEnrichedState()
+    public void GivenMicrosoftLoggerAdapterWithTraceId_WhenLogCalled_ThenForwardsToStateLoggerWithEnrichedState()
     {
         var capturing = new CapturingStateLogger();
         var accessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
@@ -61,7 +61,7 @@ public class MicrosoftLoggerAdapterTests
     }
 
     [Fact]
-    public void Should_LogWithException_CallExceptionThenLevel()
+    public void GivenMicrosoftLoggerAdapterWithException_WhenLogCalled_ThenCallsExceptionThenLevel()
     {
         var capturing = new CapturingStateLogger();
         var sp = BuildProvider(capturing, new HttpContextAccessor());
@@ -78,7 +78,7 @@ public class MicrosoftLoggerAdapterTests
     }
 
     [Fact]
-    public void Should_GetTraceIdWithNoHttpContext_ReturnNull()
+    public void GivenMicrosoftLoggerAdapterWithNoHttpContext_WhenTraceIdAccessed_ThenReturnsNull()
     {
         var capturing = new CapturingStateLogger();
         var accessor = new HttpContextAccessor { HttpContext = null };
@@ -91,7 +91,7 @@ public class MicrosoftLoggerAdapterTests
     }
 
     [Fact]
-    public void Should_GetTraceIdWithHttpContextButNoTraceId_ReturnNull()
+    public void GivenMicrosoftLoggerAdapterWithHttpContextButNoTraceId_WhenTraceIdAccessed_ThenReturnsNull()
     {
         var capturing = new CapturingStateLogger();
         var accessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
@@ -104,7 +104,7 @@ public class MicrosoftLoggerAdapterTests
     }
 
     [Fact]
-    public void Should_GetTraceId_WithTraceIdInHttpContext_ReturnTraceId()
+    public void GivenMicrosoftLoggerAdapterWithTraceIdInHttpContext_WhenTraceIdAccessed_ThenReturnsTraceId()
     {
         var capturing = new CapturingStateLogger();
         var accessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
@@ -118,7 +118,7 @@ public class MicrosoftLoggerAdapterTests
     }
 
     [Fact]
-    public void Should_SetTraceIdInHttpContext()
+    public void GivenMicrosoftLoggerAdapter_WhenTraceIdSet_ThenSetsTraceIdInHttpContext()
     {
         var capturing = new CapturingStateLogger();
         var accessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
@@ -129,7 +129,7 @@ public class MicrosoftLoggerAdapterTests
     }
 
     [Fact]
-    public void Should_SetTraceIdWithNoHttpContext_NotThrow()
+    public void GivenMicrosoftLoggerAdapterWithNoHttpContext_WhenTraceIdSet_ThenDoesNotThrow()
     {
         var capturing = new CapturingStateLogger();
         var accessor = new HttpContextAccessor { HttpContext = null };
@@ -142,7 +142,7 @@ public class MicrosoftLoggerAdapterTests
     }
 
     [Fact]
-    public void Should_SetAndGetTraceId()
+    public void GivenMicrosoftLoggerAdapter_WhenTraceIdSetAndAccessed_ThenSetsAndGetsTraceId()
     {
         var capturing = new CapturingStateLogger();
         var accessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };

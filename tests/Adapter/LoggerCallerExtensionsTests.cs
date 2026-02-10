@@ -10,7 +10,7 @@ namespace ArturRios.Logging.Tests.Adapter;
 public class LoggerCallerExtensionsTests
 {
     [Fact]
-    public void Should_LogTraceWithCaller_LogAtTraceLevel()
+    public void GivenLogger_WhenLogTraceWithCallerCalled_ThenLogsAtTraceLevel()
     {
         var mockLogger = new Mock<ILogger>();
         const string message = "Test trace message";
@@ -29,7 +29,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogDebugWithCaller_LogAtDebugLevel()
+    public void GivenLogger_WhenLogDebugWithCallerCalled_ThenLogsAtDebugLevel()
     {
         var mockLogger = new Mock<ILogger>();
         const string message = "Test debug message";
@@ -48,7 +48,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogInformationWithCaller_LogAtInformationLevel()
+    public void GivenLogger_WhenLogInformationWithCallerCalled_ThenLogsAtInformationLevel()
     {
         var mockLogger = new Mock<ILogger>();
         const string message = "Test information message";
@@ -67,7 +67,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogWarningWithCaller_LogAtWarningLevel()
+    public void GivenLogger_WhenLogWarningWithCallerCalled_ThenLogsAtWarningLevel()
     {
         var mockLogger = new Mock<ILogger>();
         const string message = "Test warning message";
@@ -86,7 +86,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogErrorWithCaller_LogAtErrorLevel()
+    public void GivenLogger_WhenLogErrorWithCallerCalled_ThenLogsAtErrorLevel()
     {
         var mockLogger = new Mock<ILogger>();
         const string message = "Test error message";
@@ -105,7 +105,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogCriticalWithCaller_LogAtCriticalLevel()
+    public void GivenLogger_WhenLogCriticalWithCallerCalled_ThenLogsAtCriticalLevel()
     {
         var mockLogger = new Mock<ILogger>();
         const string message = "Test critical message";
@@ -124,7 +124,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogExceptionWithCaller_LogExceptionWithErrorLevel()
+    public void GivenLoggerWithException_WhenLogExceptionWithCallerCalled_ThenLogsExceptionWithErrorLevel()
     {
         var mockLogger = new Mock<ILogger>();
         var exception = new InvalidOperationException("Test exception");
@@ -143,7 +143,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogExceptionWithCaller_LogWithCustomMessage()
+    public void GivenLoggerWithExceptionAndCustomMessage_WhenLogExceptionWithCallerCalled_ThenLogsWithCustomMessage()
     {
         var mockLogger = new Mock<ILogger>();
         var exception = new InvalidOperationException("Original exception message");
@@ -159,11 +159,11 @@ public class LoggerCallerExtensionsTests
             It.Is<It.IsAnyType>((v, t) => true),
             exception,
             It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)),
-            Times.Once);
+        Times.Once);
     }
 
     [Fact]
-    public void Should_LogTraceWithCaller_CaptureCallerInformation()
+    public void GivenLoggerWithCallerInfo_WhenLogTraceWithCallerCalled_ThenCapturesCallerInformation()
     {
         var mockLogger = new Mock<ILogger>();
         const string message = "Test message";
@@ -187,7 +187,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogDebugWithCaller_CaptureCallerInformation()
+    public void GivenLoggerWithCallerInfo_WhenLogDebugWithCallerCalled_ThenCapturesCallerInformation()
     {
         var mockLogger = new Mock<ILogger>();
         const string message = "Test message";
@@ -211,7 +211,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogInformationWithCaller_CaptureCallerInformation()
+    public void GivenLoggerWithCallerInfo_WhenLogInformationWithCallerCalled_ThenCapturesCallerInformation()
     {
         var mockLogger = new Mock<ILogger>();
         const string message = "Test message";
@@ -235,7 +235,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogWarningWithCaller_CaptureCallerInformation()
+    public void GivenLoggerWithCallerInfo_WhenLogWarningWithCallerCalled_ThenCapturesCallerInformation()
     {
         var mockLogger = new Mock<ILogger>();
         const string message = "Test message";
@@ -259,7 +259,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogErrorWithCaller_CaptureCallerInformation()
+    public void GivenLoggerWithCallerInfo_WhenLogErrorWithCallerCalled_ThenCapturesCallerInformation()
     {
         var mockLogger = new Mock<ILogger>();
         const string message = "Test message";
@@ -283,7 +283,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogCriticalWithCaller_CaptureCallerInformation()
+    public void GivenLoggerWithCallerInfo_WhenLogCriticalWithCallerCalled_ThenCapturesCallerInformation()
     {
         var mockLogger = new Mock<ILogger>();
         const string message = "Test message";
@@ -307,7 +307,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogExceptionWithCaller_CaptureCallerInformationWithException()
+    public void GivenLoggerWithExceptionAndCallerInfo_WhenLogExceptionWithCallerCalled_ThenCapturesCallerInformationWithException()
     {
         var mockLogger = new Mock<ILogger>();
         var exception = new InvalidOperationException("Test exception");
@@ -332,7 +332,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogExceptionWithCaller_UseExceptionMessageWhenCustomMessageIsNull()
+    public void GivenLoggerWithExceptionAndNullCustomMessage_WhenLogExceptionWithCallerCalled_ThenUsesExceptionMessage()
     {
         var mockLogger = new Mock<ILogger>();
         var exception = new InvalidOperationException("Exception message");
@@ -356,7 +356,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogTraceWithCaller_HandleDefaultCallerValues()
+    public void GivenLogger_WhenLogTraceWithCallerCalledWithDefaults_ThenHandlesDefaultCallerValues()
     {
         var mockLogger = new Mock<ILogger>();
         const string message = "Test message";
@@ -373,7 +373,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogDebugWithCaller_HandleDefaultCallerValues()
+    public void GivenLogger_WhenLogDebugWithCallerCalledWithDefaults_ThenHandlesDefaultCallerValues()
     {
         var mockLogger = new Mock<ILogger>();
         const string message = "Test message";
@@ -390,7 +390,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogInformationWithCaller_HandleDefaultCallerValues()
+    public void GivenLogger_WhenLogInformationWithCallerCalledWithDefaults_ThenHandlesDefaultCallerValues()
     {
         var mockLogger = new Mock<ILogger>();
         const string message = "Test message";
@@ -407,7 +407,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogWarningWithCaller_HandleDefaultCallerValues()
+    public void GivenLogger_WhenLogWarningWithCallerCalledWithDefaults_ThenHandlesDefaultCallerValues()
     {
         var mockLogger = new Mock<ILogger>();
         const string message = "Test message";
@@ -424,7 +424,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogErrorWithCaller_HandleDefaultCallerValues()
+    public void GivenLogger_WhenLogErrorWithCallerCalledWithDefaults_ThenHandlesDefaultCallerValues()
     {
         var mockLogger = new Mock<ILogger>();
         const string message = "Test message";
@@ -441,7 +441,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogCriticalWithCaller_HandleDefaultCallerValues()
+    public void GivenLogger_WhenLogCriticalWithCallerCalledWithDefaults_ThenHandlesDefaultCallerValues()
     {
         var mockLogger = new Mock<ILogger>();
         const string message = "Test message";
@@ -458,7 +458,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogTraceWithCaller_HandleEmptyMessage()
+    public void GivenLoggerWithEmptyMessage_WhenLogTraceWithCallerCalled_ThenHandlesEmptyMessage()
     {
         var mockLogger = new Mock<ILogger>();
         const string message = "";
@@ -477,7 +477,7 @@ public class LoggerCallerExtensionsTests
     }
 
     [Fact]
-    public void Should_LogExceptionWithCaller_HandleExceptionWithoutMessage()
+    public void GivenLoggerWithExceptionWithoutMessage_WhenLogExceptionWithCallerCalled_ThenHandlesExceptionWithoutMessage()
     {
         var mockLogger = new Mock<ILogger>();
         var exception = new InvalidOperationException();

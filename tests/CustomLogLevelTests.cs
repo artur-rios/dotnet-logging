@@ -5,7 +5,7 @@ namespace ArturRios.Logging.Tests;
 public class CustomLogLevelTests
 {
     [Fact]
-    public void Should_HaveExpectedNumericValues()
+    public void GivenCustomLogLevelEnum_WhenInspected_ThenHasExpectedNumericValues()
     {
         Assert.Equal(0, (int)CustomLogLevel.Trace);
         Assert.Equal(1, (int)CustomLogLevel.Debug);
@@ -18,7 +18,7 @@ public class CustomLogLevelTests
     }
 
     [Fact]
-    public void Should_HaveExpectedNames()
+    public void GivenCustomLogLevelEnum_WhenInspected_ThenHasExpectedNames()
     {
         Assert.Equal("Trace", nameof(CustomLogLevel.Trace));
         Assert.Equal("Debug", nameof(CustomLogLevel.Debug));
@@ -31,7 +31,7 @@ public class CustomLogLevelTests
     }
 
     [Fact]
-    public void Should_HaveExpectedDescriptions()
+    public void GivenCustomLogLevelEnum_WhenGetDescriptionCalled_ThenHasExpectedDescriptions()
     {
         Assert.Equal("TRACE", CustomLogLevel.Trace.GetDescription());
         Assert.Equal("DEBUG", CustomLogLevel.Debug.GetDescription());
