@@ -1,5 +1,9 @@
 ﻿# Dotnet Logging
 
+[![Docs](https://img.shields.io/badge/docs-website-blue)](https://artur-rios.github.io/dotnet-logging)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+[![NuGet](https://img.shields.io/nuget/v/ArturRios.Logging.svg)](https://www.nuget.org/packages/ArturRios.Logging)
+
 A flexible and feature-rich logging library for .NET applications. This library provides multiple logger implementations (Console and File), automatic caller information capture, custom log levels, and seamless integration with Microsoft.Extensions.Logging.
 
 ## Features
@@ -25,7 +29,7 @@ dotnet add package ArturRios.Logging
 
 Or via the Package Manager:
 
-```
+```bash
 Install-Package ArturRios.Logging
 ```
 

@@ -29,7 +29,7 @@ dotnet add package ArturRios.Logging
 
 Or via the Package Manager:
 
-```
+```bash
 Install-Package ArturRios.Logging
 ```
 
