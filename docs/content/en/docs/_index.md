@@ -1,8 +1,10 @@
-﻿+++
-title = 'Dotnet Logging'
-+++
-
-# Documentation
+---
+title: Documentation
+linkTitle: Documentation
+weight: 20
+description: >-
+  A flexible and feature-rich logging library for .NET applications. This library provides multiple logger implementations (Console and File), automatic caller...
+---
 
 A flexible and feature-rich logging library for .NET applications. This library provides multiple logger implementations (Console and File), automatic caller information capture, custom log levels, and seamless integration with Microsoft.Extensions.Logging.
 
