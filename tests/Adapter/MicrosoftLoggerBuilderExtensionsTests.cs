@@ -1,9 +1,10 @@
-﻿using ArturRios.Logging.Adapter;
+using ArturRios.Logging.Adapter;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace ArturRios.Logging.Tests.Adapter;
 
+[Trait("Category", "Unit")]
 public class MicrosoftLoggerBuilderExtensionsTests
 {
     [Fact]

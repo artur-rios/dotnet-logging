@@ -171,6 +171,31 @@ The library supports the following log levels in order of severity:
 5. **Error** - Errors that occurred during execution
 6. **Exception** - Exceptions that were thrown
 7. **Critical** - Critical errors requiring immediate attention
+8. **Fatal** - Unrecoverable errors that terminate the application
+
+### Folder schemes and split levels
+
+`FolderScheme` decides the directory a log file is written to, and `FileSplitLevel` decides its name.
+
+| `LogFolderScheme` | Directory under the base path |
+|---|---|
+| `AllInOne` | the base path itself |
+| `ByYear` | `2026/` |
+| `ByMonth` | `2026/08/` |
+| `ByDay` | `2026/08/24/` |
+| `ByHour` | `2026/08/24/13/` |
+| `ByRequest` | one folder per `FileLogger` instance |
+
+`ByRequest` names the folder once per logger instance, so registering the logger with a **scoped** lifetime
+gives one folder per request; a singleton gives one folder per process.
+
+| `LogSplitLevel` | File name |
+|---|---|
+| `Request` | `MyApp.log` |
+| `Year` | `MyApp_2026.log` |
+| `Month` | `MyApp_2026_08.log` |
+| `Day` | `MyApp_2026_08_24.log` |
+| `Hour` | `MyApp_2026_08_24_13.log` |
 
 ## State Logger
 
@@ -209,6 +234,20 @@ logger.Debug("Step 1 complete");    // Will include trace ID in output
 ## Contributing
 
 Contributions are welcome! Please feel free to submit issues and pull requests to improve this project.
+
+## Testing
+
+The test suite is xUnit, and every test is named with the Given / When / Then pattern. Every test class
+carries a `Category` trait, so the two kinds can be run — and reported — separately:
+
+```bash
+dotnet test src/ArturRios.Logging.sln --filter "Category=Unit"
+dotnet test src/ArturRios.Logging.sln --filter "Category=Functional"
+```
+
+Unit tests exercise the code in isolation against test doubles.
+Functional tests write real log files to a temporary directory and inspect the folder layout, file names and contents that land there.
+CI runs the two as separate jobs, and both must pass before a pull request can be merged.
 
 ## Versioning
 

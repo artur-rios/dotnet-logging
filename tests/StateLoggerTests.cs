@@ -1,4 +1,4 @@
-﻿using ArturRios.Logging.Configuration;
+using ArturRios.Logging.Configuration;
 using ArturRios.Logging.Interfaces;
 
 namespace ArturRios.Logging.Tests;
@@ -16,6 +16,7 @@ internal class DummyInternalLogger2 : IInternalLogger
     public void Fatal(string message, string filePath, string methodName) => Calls.Add((CustomLogLevel.Fatal, message, filePath, methodName));
 }
 
+[Trait("Category", "Unit")]
 public class StateLoggerTests
 {
     private class TestStateLogger : StateLogger

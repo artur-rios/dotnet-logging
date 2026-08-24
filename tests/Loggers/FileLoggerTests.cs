@@ -1,9 +1,10 @@
-﻿using ArturRios.Logging.Configuration;
+using ArturRios.Logging.Configuration;
 using ArturRios.Logging.Interfaces;
 using ArturRios.Logging.Loggers;
 
 namespace ArturRios.Logging.Tests.Loggers;
 
+[Trait("Category", "Functional")]
 public class FileLoggerTests : IDisposable
 {
     private readonly string _testLogDirectory;

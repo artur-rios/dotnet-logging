@@ -1,7 +1,8 @@
-﻿using ArturRios.Logging.Configuration;
+using ArturRios.Logging.Configuration;
 
 namespace ArturRios.Logging.Tests.Configuration;
 
+[Trait("Category", "Unit")]
 public class LogSplitLevelTests
 {
     [Fact]

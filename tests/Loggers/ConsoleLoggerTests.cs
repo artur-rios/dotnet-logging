@@ -1,9 +1,10 @@
-﻿﻿using ArturRios.Logging.Configuration;
+﻿using ArturRios.Logging.Configuration;
 using ArturRios.Logging.Interfaces;
 using ArturRios.Logging.Loggers;
 
 namespace ArturRios.Logging.Tests.Loggers;
 
+[Trait("Category", "Unit")]
 public class ConsoleLoggerTests
 {
     private readonly ConsoleLoggerConfiguration _configuration = new() { UseColors = false };

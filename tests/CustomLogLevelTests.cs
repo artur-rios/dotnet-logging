@@ -1,7 +1,8 @@
-﻿using ArturRios.Extensions;
+using ArturRios.Extensions;
 
 namespace ArturRios.Logging.Tests;
 
+[Trait("Category", "Unit")]
 public class CustomLogLevelTests
 {
     [Fact]

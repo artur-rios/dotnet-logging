@@ -1,9 +1,10 @@
-﻿using ArturRios.Logging.Configuration;
+using ArturRios.Logging.Configuration;
 using ArturRios.Logging.Factories;
 using ArturRios.Logging.Loggers;
 
 namespace ArturRios.Logging.Tests.Factories;
 
+[Trait("Category", "Unit")]
 public class InternalLoggerFactoryTests
 {
     [Fact]

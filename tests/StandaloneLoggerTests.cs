@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using ArturRios.Logging.Interfaces;
 
 namespace ArturRios.Logging.Tests;
@@ -33,6 +33,7 @@ internal class DummyInternalLogger : IInternalLogger
 }
 
 [SuppressMessage("ReSharper", "ExplicitCallerInfoArgument")] // Reason: testing purposes
+[Trait("Category", "Unit")]
 public class StandaloneLoggerTests
 {
     private class TestStandaloneLogger : StandaloneLogger

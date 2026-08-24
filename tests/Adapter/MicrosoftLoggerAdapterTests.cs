@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using ArturRios.Logging.Adapter;
 using ArturRios.Logging.Interfaces;
 using ArturRios.Logging.Tests.Helpers;
@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace ArturRios.Logging.Tests.Adapter;
 
 [SuppressMessage("Performance", "CA1873:Avoid potentially expensive logging")] // Reason: test purposes
+[Trait("Category", "Unit")]
 public class MicrosoftLoggerAdapterTests
 {
     private static ServiceProvider BuildProvider(IStateLogger stateLogger, IHttpContextAccessor accessor)

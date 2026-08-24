@@ -4,11 +4,24 @@ using ArturRios.Logging.Interfaces;
 
 namespace ArturRios.Logging.Loggers;
 
+/// <summary>
+/// Appends log entries to files on disk, organised by the folder scheme and split level in the configuration.
+/// </summary>
+/// <remarks>
+/// Writes are serialized on a process-wide lock, so entries from concurrent threads never interleave.
+/// </remarks>
+/// <param name="configuration">Controls the application name, base path, folder scheme and split level.</param>
 public class FileLogger(FileLoggerConfiguration configuration) : IInternalLogger
 {
     private const string DefaultLogFolder = "log";
     private const string FileExtension = ".log";
     private static readonly Lock s_fileLock = new();
+
+    /// <summary>
+    /// The folder name used by <see cref="LogFolderScheme.ByRequest"/>, fixed for the lifetime of this
+    /// logger. Generating it per write put every single entry in a folder of its own.
+    /// </summary>
+    private readonly string _instanceFolderName = Guid.NewGuid().ToString();
 
     /// <inheritdoc />
     public void Trace(string message, string filePath, string methodName)
@@ -111,11 +124,11 @@ public class FileLogger(FileLoggerConfiguration configuration) : IInternalLogger
                 path = Path.Combine(path, timestamp.Year.ToString(), timestamp.Month.ToString("D2"), timestamp.Day.ToString("D2"), timestamp.Hour.ToString("D2"));
                 break;
             case LogFolderScheme.ByRequest:
-                var requestId = Guid.NewGuid().ToString();
-                path = Path.Combine(path, requestId);
+                path = Path.Combine(path, _instanceFolderName);
                 break;
             default:
-                throw new ArgumentOutOfRangeException(configuration.FolderScheme.ToString());
+                throw new ArgumentOutOfRangeException(
+                    nameof(configuration), configuration.FolderScheme, "Unknown log folder scheme.");
         }
 
         return path;
@@ -130,7 +143,8 @@ public class FileLogger(FileLoggerConfiguration configuration) : IInternalLogger
             LogSplitLevel.Month => $"{configuration.ApplicationName}_{timestamp:yyyy_MM}",
             LogSplitLevel.Day => $"{configuration.ApplicationName}_{timestamp:yyyy_MM_dd}",
             LogSplitLevel.Hour => $"{configuration.ApplicationName}_{timestamp:yyyy_MM_dd_HH}",
-            _ => throw new ArgumentOutOfRangeException(configuration.FileSplitLevel.ToString())
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(configuration), configuration.FileSplitLevel, "Unknown log split level.")
         };
     }
 }

@@ -6,11 +6,27 @@ using Microsoft.Extensions.Logging;
 
 namespace ArturRios.Logging.Adapter;
 
+/// <summary>
+/// Bridges <see cref="ILogger"/> onto <see cref="IStateLogger"/>, so code written against
+/// Microsoft.Extensions.Logging reaches this library's loggers.
+/// </summary>
+/// <remarks>
+/// Each call resolves <see cref="IStateLogger"/> from a fresh dependency injection scope, so a scoped
+/// dependency of the state logger is isolated per log entry. The correlation id therefore does not travel
+/// through the scope; it is read from the current <see cref="HttpContext"/> instead, where the tracing
+/// middleware puts it.
+/// </remarks>
+/// <param name="services">The provider used to resolve the state logger and the HTTP context accessor.</param>
+/// <exception cref="ArgumentNullException"><paramref name="services"/> is <c>null</c>.</exception>
 public class MicrosoftLoggerAdapter(IServiceProvider services) : ILogger
 {
     private readonly IServiceProvider _services = services ?? throw new ArgumentNullException(nameof(services));
 
-    // Expose TraceId by reading/writing the current HttpContext item (if available)
+    /// <summary>
+    /// Gets or sets the correlation id carried by the current <see cref="HttpContext"/>, or <c>null</c> when
+    /// there is no HTTP context — outside a request, or when no <see cref="IHttpContextAccessor"/> is
+    /// registered. Setting it outside a request is a no-op.
+    /// </summary>
     public string? TraceId
     {
         get
@@ -168,8 +184,12 @@ public class MicrosoftLoggerAdapter(IServiceProvider services) : ILogger
                 var ns = declaring.Namespace ?? string.Empty;
 
                 // Skip known logging infrastructure namespaces so we find the real caller
+                // ArturRios.Logging is this library's own namespace. The predecessor of this check named
+                // ArturRios.Common.Logging, which no longer exists, so nothing here was ever skipped and the
+                // frame reported as the caller was MicrosoftLoggerAdapter.Log itself.
                 if (ns.StartsWith("Microsoft.Extensions.Logging", StringComparison.Ordinal) ||
-                    ns.StartsWith("ArturRios.Common.Logging", StringComparison.Ordinal) ||
+                    ns.Equals("ArturRios.Logging", StringComparison.Ordinal) ||
+                    ns.StartsWith("ArturRios.Logging.", StringComparison.Ordinal) ||
                     ns.StartsWith("System.", StringComparison.Ordinal))
                 {
                     continue;
