@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using ArturRios.Logging.Adapter;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -7,6 +7,7 @@ namespace ArturRios.Logging.Tests.Adapter;
 
 [SuppressMessage("ReSharper", "ExplicitCallerInfoArgument")]
 [SuppressMessage("Performance", "CA1873:Avoid potentially expensive logging")]
+[Trait("Category", "Unit")]
 public class LoggerCallerExtensionsTests
 {
     [Fact]

@@ -5,6 +5,13 @@ using ArturRios.Util.Collections;
 
 namespace ArturRios.Logging.Loggers;
 
+/// <summary>
+/// Writes log entries to the system console, optionally colored by level.
+/// </summary>
+/// <remarks>
+/// Writes are serialized on a process-wide lock, so entries from concurrent threads never interleave.
+/// </remarks>
+/// <param name="configuration">Controls whether ANSI color sequences are emitted.</param>
 public class ConsoleLogger(ConsoleLoggerConfiguration configuration) : IInternalLogger
 {
     private static readonly Lock s_writeLock = new();

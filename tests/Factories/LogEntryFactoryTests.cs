@@ -1,7 +1,8 @@
-﻿using ArturRios.Logging.Factories;
+using ArturRios.Logging.Factories;
 
 namespace ArturRios.Logging.Tests.Factories;
 
+[Trait("Category", "Unit")]
 public class LogEntryFactoryTests
 {
     [Fact]

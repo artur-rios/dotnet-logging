@@ -1,7 +1,8 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 
 namespace ArturRios.Logging.Tests;
 
+[Trait("Category", "Unit")]
 public class ConsoleAnsiTests
 {
     [Fact]
