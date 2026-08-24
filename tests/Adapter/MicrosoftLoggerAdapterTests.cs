@@ -1,8 +1,8 @@
+﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using ArturRios.Logging.Adapter;
 using ArturRios.Logging.Interfaces;
 using ArturRios.Logging.Tests.Helpers;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -12,12 +12,11 @@ namespace ArturRios.Logging.Tests.Adapter;
 [Trait("Category", "Unit")]
 public class MicrosoftLoggerAdapterTests
 {
-    private static ServiceProvider BuildProvider(IStateLogger stateLogger, IHttpContextAccessor accessor)
+    private static ServiceProvider BuildProvider(IStateLogger stateLogger)
     {
         var services = new ServiceCollection();
 
         services.AddSingleton(stateLogger);
-        services.AddSingleton(accessor);
 
         return services.BuildServiceProvider();
     }
@@ -26,11 +25,9 @@ public class MicrosoftLoggerAdapterTests
     public void GivenMicrosoftLoggerAdapterWithTraceId_WhenLogCalled_ThenForwardsToStateLoggerWithEnrichedState()
     {
         var capturing = new CapturingStateLogger();
-        var accessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
-        accessor.HttpContext!.Items["TraceId"] = "trace-123";
 
-        var sp = BuildProvider(capturing, accessor);
-        var logger = new MicrosoftLoggerAdapter(sp);
+        var sp = BuildProvider(capturing);
+        var logger = new MicrosoftLoggerAdapter(sp) { TraceId = "trace-123" };
 
         Assert.True(logger.IsEnabled(LogLevel.Information));
 
@@ -65,7 +62,7 @@ public class MicrosoftLoggerAdapterTests
     public void GivenMicrosoftLoggerAdapterWithException_WhenLogCalled_ThenCallsExceptionThenLevel()
     {
         var capturing = new CapturingStateLogger();
-        var sp = BuildProvider(capturing, new HttpContextAccessor());
+        var sp = BuildProvider(capturing);
         var logger = new MicrosoftLoggerAdapter(sp);
 
         var ex = new InvalidOperationException("oops");
@@ -79,62 +76,49 @@ public class MicrosoftLoggerAdapterTests
     }
 
     [Fact]
-    public void GivenMicrosoftLoggerAdapterWithNoHttpContext_WhenTraceIdAccessed_ThenReturnsNull()
+    public void GivenNoAmbientActivityAndNoOverride_WhenTraceIdAccessed_ThenNullComesBack()
     {
-        var capturing = new CapturingStateLogger();
-        var accessor = new HttpContextAccessor { HttpContext = null };
-        var sp = BuildProvider(capturing, accessor);
+        var sp = BuildProvider(new CapturingStateLogger());
         var logger = new MicrosoftLoggerAdapter(sp);
 
-        var traceId = logger.TraceId;
-
-        Assert.Null(traceId);
+        Assert.Null(Activity.Current);
+        Assert.Null(logger.TraceId);
     }
 
     [Fact]
-    public void GivenMicrosoftLoggerAdapterWithHttpContextButNoTraceId_WhenTraceIdAccessed_ThenReturnsNull()
+    public void GivenAnAmbientActivity_WhenTraceIdAccessed_ThenItsTraceIdComesBack()
     {
-        var capturing = new CapturingStateLogger();
-        var accessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
-        var sp = BuildProvider(capturing, accessor);
+        var sp = BuildProvider(new CapturingStateLogger());
         var logger = new MicrosoftLoggerAdapter(sp);
 
-        var traceId = logger.TraceId;
+        using var activity = new Activity("test").SetIdFormat(ActivityIdFormat.W3C).Start();
 
-        Assert.Null(traceId);
+        Assert.Equal(activity.TraceId.ToString(), logger.TraceId);
     }
 
     [Fact]
-    public void GivenMicrosoftLoggerAdapterWithTraceIdInHttpContext_WhenTraceIdAccessed_ThenReturnsTraceId()
+    public void GivenATraceIdWasSet_WhenTraceIdAccessed_ThenItComesBack()
     {
-        var capturing = new CapturingStateLogger();
-        var accessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
-        accessor.HttpContext!.Items["TraceId"] = "trace-456";
-        var sp = BuildProvider(capturing, accessor);
-        var logger = new MicrosoftLoggerAdapter(sp);
+        var sp = BuildProvider(new CapturingStateLogger());
+        var logger = new MicrosoftLoggerAdapter(sp) { TraceId = "trace-456" };
 
-        var traceId = logger.TraceId;
-
-        Assert.Equal("trace-456", traceId);
+        Assert.Equal("trace-456", logger.TraceId);
     }
 
     [Fact]
-    public void GivenMicrosoftLoggerAdapter_WhenTraceIdSet_ThenSetsTraceIdInHttpContext()
+    public void GivenATraceIdIsSetOnOneAdapter_WhenReadFromAnother_ThenTheSameContextSeesIt()
     {
-        var capturing = new CapturingStateLogger();
-        var accessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
-        var sp = BuildProvider(capturing, accessor);
+        var sp = BuildProvider(new CapturingStateLogger());
+
         _ = new MicrosoftLoggerAdapter(sp) { TraceId = "trace-789" };
 
-        Assert.Equal("trace-789", accessor.HttpContext!.Items["TraceId"]);
+        Assert.Equal("trace-789", new MicrosoftLoggerAdapter(sp).TraceId);
     }
 
     [Fact]
-    public void GivenMicrosoftLoggerAdapterWithNoHttpContext_WhenTraceIdSet_ThenDoesNotThrow()
+    public void GivenNoAmbientActivity_WhenTraceIdSet_ThenDoesNotThrow()
     {
-        var capturing = new CapturingStateLogger();
-        var accessor = new HttpContextAccessor { HttpContext = null };
-        var sp = BuildProvider(capturing, accessor);
+        var sp = BuildProvider(new CapturingStateLogger());
         var logger = new MicrosoftLoggerAdapter(sp);
 
         var exception = Record.Exception(() => logger.TraceId = "trace-xyz");
@@ -143,11 +127,11 @@ public class MicrosoftLoggerAdapterTests
     }
 
     [Fact]
-    public void GivenMicrosoftLoggerAdapter_WhenTraceIdSetAndAccessed_ThenSetsAndGetsTraceId()
+    public void GivenAnOverrideAndAnAmbientActivity_WhenTraceIdAccessed_ThenTheOverrideWins()
     {
-        var capturing = new CapturingStateLogger();
-        var accessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
-        var sp = BuildProvider(capturing, accessor);
+        var sp = BuildProvider(new CapturingStateLogger());
+
+        using var activity = new Activity("test").SetIdFormat(ActivityIdFormat.W3C).Start();
         var logger = new MicrosoftLoggerAdapter(sp) { TraceId = "trace-roundtrip" };
 
         var retrievedTraceId = logger.TraceId;

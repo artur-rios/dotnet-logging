@@ -1,7 +1,6 @@
-using ArturRios.Logging.Adapter;
+﻿using ArturRios.Logging.Adapter;
 using ArturRios.Logging.Interfaces;
 using ArturRios.Logging.Tests.Helpers;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -20,7 +19,6 @@ public class CallerResolutionTests
         var services = new ServiceCollection();
 
         services.AddSingleton(stateLogger);
-        services.AddSingleton<IHttpContextAccessor>(new HttpContextAccessor());
 
         return services.BuildServiceProvider();
     }
