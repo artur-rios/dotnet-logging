@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using ArturRios.Logging.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -11,35 +10,47 @@ namespace ArturRios.Logging.Adapter;
 /// Microsoft.Extensions.Logging reaches this library's loggers.
 /// </summary>
 /// <remarks>
+/// <para>
 /// Each call resolves <see cref="IStateLogger"/> from a fresh dependency injection scope, so a scoped
 /// dependency of the state logger is isolated per log entry. The correlation id therefore does not travel
-/// through the scope; it is read from the current <see cref="HttpContext"/> instead, where the tracing
-/// middleware puts it.
+/// through the scope; it is read from the ambient <see cref="Activity"/> instead.
+/// </para>
+/// <para>
+/// <see cref="Activity"/> is the correlation primitive of the platform, not of any one hosting model: an
+/// ASP.NET Core request has one, and so does a worker, a console app or a test. Reading the id from there
+/// is what lets this library log correlated entries without depending on ASP.NET Core.
+/// </para>
 /// </remarks>
-/// <param name="services">The provider used to resolve the state logger and the HTTP context accessor.</param>
+/// <param name="services">The provider used to resolve the state logger.</param>
 /// <exception cref="ArgumentNullException"><paramref name="services"/> is <c>null</c>.</exception>
 public class MicrosoftLoggerAdapter(IServiceProvider services) : ILogger
 {
+    /// <summary>
+    /// A correlation id set explicitly by a caller, overriding the ambient activity's. Held in an
+    /// <see cref="AsyncLocal{T}"/> so it flows with the execution context — per request under a server,
+    /// per logical operation anywhere else — rather than leaking across concurrent work.
+    /// </summary>
+    private static readonly AsyncLocal<string?> Override = new();
+
     private readonly IServiceProvider _services = services ?? throw new ArgumentNullException(nameof(services));
 
     /// <summary>
-    /// Gets or sets the correlation id carried by the current <see cref="HttpContext"/>, or <c>null</c> when
-    /// there is no HTTP context — outside a request, or when no <see cref="IHttpContextAccessor"/> is
-    /// registered. Setting it outside a request is a no-op.
+    /// Gets or sets the correlation id stamped on log entries.
     /// </summary>
+    /// <value>
+    /// The id set explicitly on this property, or the trace id of <see cref="Activity.Current"/> when none
+    /// was set, or <c>null</c> when there is no ambient activity either.
+    /// </value>
+    /// <remarks>
+    /// Setting it establishes the id for the current execution context and everything that flows from it.
+    /// <c>ArturRios.Util.WebApi</c>'s <c>TraceActivityMiddleware</c> starts a W3C activity per request and
+    /// derives its own trace id from exactly this activity, so under that middleware the value read here is
+    /// the same one the middleware publishes — with no ASP.NET Core dependency on this side.
+    /// </remarks>
     public string? TraceId
     {
-        get
-        {
-            var accessor = _services.GetService<IHttpContextAccessor>();
-            return accessor?.HttpContext?.Items["TraceId"] as string;
-        }
-        set
-        {
-            var accessor = _services.GetService<IHttpContextAccessor>();
-
-            accessor?.HttpContext?.Items["TraceId"] = value;
-        }
+        get => Override.Value ?? Activity.Current?.TraceId.ToString();
+        set => Override.Value = value;
     }
 
     /// <inheritdoc />
@@ -63,12 +74,11 @@ public class MicrosoftLoggerAdapter(IServiceProvider services) : ILogger
         // Resolve the scoped IStateLogger (if not registered you'll get null)
         using var scope = _services.CreateScope();
         var stateLogger = scope.ServiceProvider.GetService<IStateLogger>();
-        var httpAccessor = scope.ServiceProvider.GetService<IHttpContextAccessor>();
 
-        // Propagate TraceId from HttpContext (middleware should set this per request)
-        if (stateLogger is not null && httpAccessor?.HttpContext?.Items["TraceId"] is string httpTrace)
+        // Propagate the ambient correlation id, whether set explicitly or carried by the current activity.
+        if (stateLogger is not null && TraceId is { } ambientTraceId)
         {
-            stateLogger.TraceId = httpTrace;
+            stateLogger.TraceId = ambientTraceId;
         }
 
         if (stateLogger is null)

@@ -231,9 +231,61 @@ logger.Info("Processing request");  // Will include trace ID in output
 logger.Debug("Step 1 complete");    // Will include trace ID in output
 ```
 
+### Through Microsoft.Extensions.Logging
+
+`MicrosoftLoggerAdapter` stamps a correlation id on everything it forwards, taken from the ambient
+[`Activity`](https://learn.microsoft.com/dotnet/api/system.diagnostics.activity):
+
+```csharp
+using var activity = new Activity("ProcessOrder").SetIdFormat(ActivityIdFormat.W3C).Start();
+
+logger.LogInformation("Processing order");  // carries activity.TraceId
+```
+
+`Activity` is the platform's correlation primitive, not any one hosting model's, so this works the same in
+a web application, a worker, a console app and a test. Nested activities share a trace id, so every entry
+from one logical operation correlates.
+
+To override it — a message id from a queue, a correlation id from an upstream header — assign it:
+
+```csharp
+adapter.TraceId = messageId;
+```
+
+The value is held in an `AsyncLocal<string?>`, so it applies to the current execution context and
+everything that flows from it, and does not leak into concurrent work. It takes precedence over the
+activity's id until it is cleared.
+
+Under `ArturRios.Util.WebApi`, `TraceActivityMiddleware` starts a W3C activity per request and derives its
+own trace id from exactly that activity — so the id logged here is the one the middleware publishes on the
+`traceparent` response header, with no wiring and no ASP.NET Core dependency on this side.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit issues and pull requests to improve this project.
+
+## Upgrading to 2.0
+
+**`Microsoft.AspNetCore.Http` is gone.** The package no longer depends on it, so `ArturRios.Logging` is
+now usable from a console app or a worker without dragging in an ASP.NET Core 2.x compatibility package
+and its transitive closure.
+
+**`MicrosoftLoggerAdapter.TraceId` reads the ambient `Activity` instead of `HttpContext.Items["TraceId"]`.**
+
+For anything running behind `ArturRios.Util.WebApi`'s `TraceActivityMiddleware`, **nothing changes**: that
+middleware starts a W3C activity per request and sets `HttpContext.Items["TraceId"]` to
+`activity.TraceId.ToString()`, so the value read from the activity is the same string that used to be read
+from the items dictionary.
+
+Two cases do change:
+
+- Code that wrote `HttpContext.Items["TraceId"]` **by hand**, without an activity, is no longer seen.
+  Start an activity, or assign `adapter.TraceId` directly.
+- Setting `adapter.TraceId` no longer writes into `HttpContext.Items`. It sets an `AsyncLocal` that this
+  library reads; anything else reading that dictionary entry must be given the value explicitly.
+
+`IHttpContextAccessor` no longer needs to be registered for correlation to work, and registering it has no
+effect on this library.
 
 ## Testing
 
