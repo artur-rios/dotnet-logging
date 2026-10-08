@@ -1,7 +1,7 @@
 # Dotnet Logging
 
 [![Docs](https://img.shields.io/badge/docs-website-blue)](https://artur-rios.github.io/dotnet-logging)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/artur-rios/dotnet-logging/blob/main/LICENSE)
 [![NuGet](https://img.shields.io/nuget/v/ArturRios.Logging.svg)](https://www.nuget.org/packages/ArturRios.Logging)
 
 A flexible and feature-rich logging library for .NET applications. This library provides multiple logger implementations (Console and File), automatic caller information capture, custom log levels, and seamless integration with Microsoft.Extensions.Logging.
@@ -10,7 +10,7 @@ A flexible and feature-rich logging library for .NET applications. This library 
 
 - **Multiple Logger Implementations**: Console and File loggers with customizable configurations
 - **Automatic Caller Information**: Capture file path and method name automatically using compiler attributes
-- **Custom Log Levels**: 7 severity levels - Trace, Debug, Information, Warning, Error, Exception, and Critical
+- **Custom Log Levels**: 8 severity levels - Trace, Debug, Information, Warning, Error, Exception, Critical, and Fatal
 - **Color-Coded Console Output**: ANSI color support for better console readability on Windows and Unix-like systems
 - **Flexible File Logging**: Configurable log file output with options for splitting logs
 - **Trace ID Support**: Built-in correlation ID tracking for distributed tracing
@@ -108,7 +108,7 @@ var configurations = new List<LoggerConfiguration>
 
 var logger = new StandaloneLogger(configurations);
 
-// Messages will be logged to both console and file based on their log level
+// Every message is written to both the console and the file; there is no minimum level filter
 logger.Warn("This warning appears in both console and file");
 ```
 
@@ -119,9 +119,19 @@ Integrate with ASP.NET Core or other frameworks using the standard logging abstr
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ArturRios.Logging;
 using ArturRios.Logging.Adapter;
+using ArturRios.Logging.Configuration;
+using ArturRios.Logging.Interfaces;
 
 var services = new ServiceCollection();
+
+// The adapter forwards every entry to an IStateLogger resolved from a fresh scope;
+// without this registration nothing is written.
+services.AddScoped<IStateLogger>(_ => new StateLogger(new List<LoggerConfiguration>
+{
+    new ConsoleLoggerConfiguration { UseColors = true }
+}));
 
 services.AddLogging(builder =>
 {
@@ -184,8 +194,10 @@ The library supports the following log levels in order of severity:
 | `ByHour` | `2026/08/24/13/` |
 | `ByRequest` | one folder per `FileLogger` instance |
 
-`ByRequest` names the folder once per logger instance, so registering the logger with a **scoped** lifetime
-gives one folder per request; a singleton gives one folder per process.
+`ByRequest` names the folder once per logger instance, so resolving the logger from a **scoped** registration
+within a request gives one folder per request; a singleton gives one folder per process. Entries forwarded by
+`MicrosoftLoggerAdapter` resolve the `IStateLogger` from a fresh scope per entry, so through the adapter a scoped
+registration gives one folder per entry.
 
 | `LogSplitLevel` | File name |
 |---|---|
@@ -197,15 +209,24 @@ gives one folder per request; a singleton gives one folder per process.
 
 ## State Logger
 
-The `StateLogger` class allows you to manage logging state across your application:
+`StateLogger` takes the caller's file and method from a state object instead of compiler attributes — the
+shape Microsoft.Extensions.Logging passes along, which is how `MicrosoftLoggerAdapter` uses it. The keys
+`CallerFilePath` / `FilePath` and `CallerMemberName` / `MemberName` / `Method` are recognized regardless of case;
+anything missing is logged as `unknown`.
 
 ```csharp
 using ArturRios.Logging;
 
-var stateLogger = new StateLogger();
-stateLogger.SetTraceId("trace-123");
-stateLogger.Log("Operation started");
-stateLogger.ClearTraceId();
+var stateLogger = new StateLogger(configurations);
+stateLogger.TraceId = "trace-123";
+
+stateLogger.Info("Operation started", new Dictionary<string, object>
+{
+    ["CallerFilePath"] = "OrderService.cs",
+    ["CallerMemberName"] = "PlaceOrder"
+});
+
+stateLogger.TraceId = null;
 ```
 
 ## Automatic Caller Information
@@ -254,85 +275,30 @@ The value is held in an `AsyncLocal<string?>`, so it applies to the current exec
 everything that flows from it, and does not leak into concurrent work. It takes precedence over the
 activity's id until it is cleared.
 
+The adapter hands that id to the `IStateLogger` it resolves for the one entry being forwarded and then puts
+the state logger's own `TraceId` back, so a singleton `IStateLogger` can be shared by concurrent work without
+one entry's id landing on another entry's line or on a later entry that has no id of its own.
+
 Under `ArturRios.Util.WebApi`, `TraceActivityMiddleware` starts a W3C activity per request and derives its
 own trace id from exactly that activity — so the id logged here is the one the middleware publishes on the
 `traceparent` response header, with no wiring and no ASP.NET Core dependency on this side.
 
+## Upgrading
+
+Releases that need changes in consuming code carry an upgrade guide in the changelog:
+
+- From 1.x to 2.0: [Upgrading from 1.x to 2.0](https://github.com/artur-rios/dotnet-logging/blob/main/CHANGELOG.md#upgrading-from-1x-to-20)
+
+## Changelog
+
+Notable changes in each release are recorded in [CHANGELOG.md](https://github.com/artur-rios/dotnet-logging/blob/main/CHANGELOG.md). Releases follow
+[Semantic Versioning](https://semver.org/).
+
 ## Contributing
 
-Contributions are welcome! Please feel free to submit issues and pull requests to improve this project.
-
-## Upgrading to 2.0
-
-**`Microsoft.AspNetCore.Http` is gone.** The package no longer depends on it, so `ArturRios.Logging` is
-now usable from a console app or a worker without dragging in an ASP.NET Core 2.x compatibility package
-and its transitive closure.
-
-**`MicrosoftLoggerAdapter.TraceId` reads the ambient `Activity` instead of `HttpContext.Items["TraceId"]`.**
-
-For anything running behind `ArturRios.Util.WebApi`'s `TraceActivityMiddleware`, **nothing changes**: that
-middleware starts a W3C activity per request and sets `HttpContext.Items["TraceId"]` to
-`activity.TraceId.ToString()`, so the value read from the activity is the same string that used to be read
-from the items dictionary.
-
-Two cases do change:
-
-- Code that wrote `HttpContext.Items["TraceId"]` **by hand**, without an activity, is no longer seen.
-  Start an activity, or assign `adapter.TraceId` directly.
-- Setting `adapter.TraceId` no longer writes into `HttpContext.Items`. It sets an `AsyncLocal` that this
-  library reads; anything else reading that dictionary entry must be given the value explicitly.
-
-`IHttpContextAccessor` no longer needs to be registered for correlation to work, and registering it has no
-effect on this library.
-
-## Testing
-
-The test suite is xUnit, and every test is named with the Given / When / Then pattern. Every test class
-carries a `Category` trait, so the two kinds can be run — and reported — separately:
-
-```bash
-dotnet test src/ArturRios.Logging.sln --filter "Category=Unit"
-dotnet test src/ArturRios.Logging.sln --filter "Category=Functional"
-```
-
-Unit tests exercise the code in isolation against test doubles.
-Functional tests write real log files to a temporary directory and inspect the folder layout, file names and contents that land there.
-CI runs the two as separate jobs, and both must pass before a pull request can be merged.
-
-## Branching and releases
-
-`develop` is the integration branch and the base for all new work; `main` only holds released code.
-
-1. Branch off `develop` — `feature/<name>` for features, `fix/<name>` for fixes (`chore/`, `refactor/`, `docs/`,
-   `ci/`, `test/`, `perf/` and `build/` are accepted too) — and open a pull request back into `develop`.
-2. To release, cut `release/<version>` from `develop`, set `<Version>` in `src/ArturRios.Logging.csproj` to that version
-   and open a pull request into `main`. Only `release/*` branches can be merged into `main`.
-3. Once it is merged, tag the merge commit on `main` with the version. Pushing the tag publishes the package to
-   nuget.org and GitHub Packages:
-
-   ```bash
-   git switch main && git pull
-   git tag <version> && git push origin <version>
-   ```
-
-4. Open a pull request from `main` into `develop` to bring the release back into the integration branch.
-
-Pull requests into `develop` and `main` must pass the tests and the branch policy check. Only the repository owner can
-push version tags, and the publish workflow rejects tags that do not point at a commit on `main`.
-
-## Versioning
-
-Semantic Versioning (SemVer). Breaking changes result in a new major version. New methods or non-breaking behavior
-changes increment the minor version; fixes or tweaks increment the patch.
-
-## Build, test and publish
-
-Use the official [.NET CLI](https://learn.microsoft.com/en-us/dotnet/core/tools/) to build, test and publish the project and Git for source control.
-If you want, optional helper toolsets I built to facilitate these tasks are available:
-
-- [Dotnet Tools](https://github.com/artur-rios/dotnet-tools)
-- [Python Dotnet Tools](https://github.com/artur-rios/python-dotnet-tools)
+Contributions are welcome! Building from source, running the tests, the branching model and the release process are
+described in [CONTRIBUTING.md](https://github.com/artur-rios/dotnet-logging/blob/main/CONTRIBUTING.md).
 
 ## Legal Details
 
-This project is licensed under the [MIT License](https://en.wikipedia.org/wiki/MIT_License). A copy of the license is available at [LICENSE](./LICENSE) in the repository.
+This project is licensed under the [MIT License](https://en.wikipedia.org/wiki/MIT_License). A copy of the license is available at [LICENSE](https://github.com/artur-rios/dotnet-logging/blob/main/LICENSE) in the repository.
