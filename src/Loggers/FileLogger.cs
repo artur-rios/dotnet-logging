@@ -73,13 +73,16 @@ public class FileLogger(FileLoggerConfiguration configuration) : IInternalLogger
 
     private void Write(CustomLogLevel level, string filePath, string methodName, string message)
     {
-        var path = BuildFullPath();
+        // One instant for both the file and the entry: reading the clock twice could put an entry stamped just
+        // after midnight (or the hour, month, year) into the file of the period before.
+        var timestamp = DateTime.UtcNow;
+        var path = BuildFullPath(timestamp);
 
         CreateDirectoryIfNotExists(path);
 
         lock (s_fileLock)
         {
-            File.AppendAllText(path, LogEntryFactory.Create(level, filePath, methodName, message));
+            File.AppendAllText(path, LogEntryFactory.Create(level, filePath, methodName, message, timestamp));
         }
     }
 
@@ -93,9 +96,8 @@ public class FileLogger(FileLoggerConfiguration configuration) : IInternalLogger
         }
     }
 
-    private string BuildFullPath()
+    private string BuildFullPath(DateTime timestamp)
     {
-        var timestamp = DateTime.UtcNow;
         var folderPath = BuildFolderPath(timestamp);
         var fileName = BuildFileName(timestamp);
 

@@ -40,7 +40,7 @@ public class AmbientTraceIdTests
 
         LogOnce(logger);
 
-        Assert.Equal(activity.TraceId.ToString(), capturing.TraceId);
+        Assert.Equal(activity.TraceId.ToString(), capturing.LastTraceId);
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public class AmbientTraceIdTests
 
         LogOnce(logger);
 
-        Assert.Null(capturing.TraceId);
+        Assert.Null(capturing.LastTraceId);
     }
 
     [Fact]
@@ -66,8 +66,8 @@ public class AmbientTraceIdTests
 
         LogOnce(logger);
 
-        Assert.Equal("explicit-id", capturing.TraceId);
-        Assert.NotEqual(activity.TraceId.ToString(), capturing.TraceId);
+        Assert.Equal("explicit-id", capturing.LastTraceId);
+        Assert.NotEqual(activity.TraceId.ToString(), capturing.LastTraceId);
     }
 
     [Fact]
@@ -85,7 +85,7 @@ public class AmbientTraceIdTests
             LogOnce(logger);
 
             Assert.Equal(outerTraceId, inner.TraceId.ToString());
-            Assert.Equal(outerTraceId, capturing.TraceId);
+            Assert.Equal(outerTraceId, capturing.LastTraceId);
         }
     }
 

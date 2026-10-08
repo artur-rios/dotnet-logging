@@ -66,7 +66,7 @@ public class StateLoggerTests
     {
         var logger = new TestStateLogger { TraceId = "t1" };
         var ex = new InvalidOperationException("boom");
-        logger.Exception(ex, new[] { new KeyValuePair<string, object>("CallerFilePath", "fp"), new KeyValuePair<string, object>("CallerMemberName", "mn")});
+        logger.Exception(ex, new[] { new KeyValuePair<string, object>("CallerFilePath", "fp"), new KeyValuePair<string, object>("CallerMemberName", "mn") });
         var call = logger.Dummy.Calls.Last();
 
         Assert.Equal(CustomLogLevel.Exception, call.Level);
@@ -409,7 +409,7 @@ public class StateLoggerTests
         var logger = new TestStateLogger();
         var ex = new InvalidOperationException("message");
 
-        logger.Exception(ex, new[] { new KeyValuePair<string, object>("CallerFilePath", "fp"), new KeyValuePair<string, object>("CallerMemberName", "mn")});
+        logger.Exception(ex, new[] { new KeyValuePair<string, object>("CallerFilePath", "fp"), new KeyValuePair<string, object>("CallerMemberName", "mn") });
 
         var call = Assert.Single(logger.Dummy.Calls);
 
@@ -423,7 +423,7 @@ public class StateLoggerTests
         var logger = new TestStateLogger { TraceId = null };
         var ex = new Exception("test");
 
-        logger.Exception(ex, new[] { new KeyValuePair<string, object>("CallerFilePath", "fp"), new KeyValuePair<string, object>("CallerMemberName", "mn")});
+        logger.Exception(ex, new[] { new KeyValuePair<string, object>("CallerFilePath", "fp"), new KeyValuePair<string, object>("CallerMemberName", "mn") });
 
         var call = Assert.Single(logger.Dummy.Calls);
 
@@ -440,9 +440,17 @@ public class StateLoggerTests
         var list = (List<IInternalLogger>)field.GetValue(logger)!;
         list.Add(dummy2);
 
-        logger.Info("test", new[] { new KeyValuePair<string, object>("CallerFilePath", "fp"), new KeyValuePair<string, object>("CallerMemberName", "mn")});
+        logger.Info("test", new[] { new KeyValuePair<string, object>("CallerFilePath", "fp"), new KeyValuePair<string, object>("CallerMemberName", "mn") });
 
         Assert.Single(logger.Dummy.Calls);
         Assert.Single(dummy2.Calls);
+    }
+
+    [Fact]
+    public void GivenNullConfigurations_WhenStateLoggerConstructed_ThenArgumentNullExceptionIsThrown()
+    {
+        var exception = Assert.Throws<ArgumentNullException>(() => new StateLogger(null!));
+
+        Assert.Equal("configurations", exception.ParamName);
     }
 }
