@@ -15,6 +15,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   of a `NullReferenceException`.
 - The `StandaloneLogger` and `StateLogger` constructors throw `ArgumentNullException` for a null configuration list
   instead of a `NullReferenceException`.
+- The package's project URL is the documentation site's new address, `https://docs.artur-rios.tech/dotnet-logging`, since the
+  site moved from GitHub Pages.
 
 ### Fixed
 

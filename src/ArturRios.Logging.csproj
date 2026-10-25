@@ -15,7 +15,7 @@
     <Nullable>enable</Nullable>
     <PackageId>ArturRios.Logging</PackageId>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageProjectUrl>https://artur-rios.github.io/dotnet-logging</PackageProjectUrl>
+    <PackageProjectUrl>https://docs.artur-rios.tech/dotnet-logging</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>utilities</PackageTags>
     <RepositoryUrl>https://github.com/artur-rios/dotnet-logging</RepositoryUrl>
