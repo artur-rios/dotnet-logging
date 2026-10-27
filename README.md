@@ -6,9 +6,11 @@
 > its issues and pull requests are not followed. If you want to contribute, email me at
 > arturdev@duck.com.
 
-[![Docs](https://img.shields.io/badge/docs-website-blue)](https://artur-rios.github.io/dotnet-logging)
+[![Docs](https://img.shields.io/badge/docs-website-blue)](https://docs.artur-rios.tech/dotnet-logging)
 [![License: Attribution](https://img.shields.io/badge/License-Attribution-blue.svg)](https://github.com/artur-rios/dotnet-logging/blob/main/LICENSE)
 [![NuGet](https://img.shields.io/nuget/v/ArturRios.Logging.svg)](https://www.nuget.org/packages/ArturRios.Logging)
+
+This repository lives at <https://git.techcraftsmen.net/artur-rios/dotnet-logging>. The GitHub repository is a read-only mirror of it.
 
 A flexible and feature-rich logging library for .NET applications. This library provides multiple logger implementations (Console and File), automatic caller information capture, custom log levels, and seamless integration with Microsoft.Extensions.Logging.
 
