@@ -21,4 +21,14 @@ public class LogEntryFactoryTests
         Assert.Contains("Hello", result);
         Assert.EndsWith(Environment.NewLine, result);
     }
+
+    [Fact]
+    public void GivenATimestamp_WhenCreateCalledWithIt_ThenTheEntryCarriesExactlyThatInstant()
+    {
+        var timestamp = new DateTime(2025, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
+
+        var result = LogEntryFactory.Create(CustomLogLevel.Information, "A.cs", "M", "msg", timestamp);
+
+        Assert.Equal($"INFO: A | M | {timestamp:o} | msg{Environment.NewLine}", result);
+    }
 }

@@ -66,7 +66,7 @@ public class MicrosoftLoggerBuilderExtensionsTests
     }
 
     [Fact]
-    public void GivenLoggingBuilder_WhenAddCustomLoggerCalledMultipleTimes_ThenAllowsMultipleCalls()
+    public void GivenLoggingBuilder_WhenAddCustomLoggerCalledMultipleTimes_ThenRegistersTheProviderOnce()
     {
         var services = new ServiceCollection();
         services.AddLogging(builder =>
@@ -78,7 +78,7 @@ public class MicrosoftLoggerBuilderExtensionsTests
         var serviceProvider = services.BuildServiceProvider();
         var loggerProviders = serviceProvider.GetServices<ILoggerProvider>();
 
-        Assert.True(loggerProviders.Any());
+        Assert.Single(loggerProviders.OfType<MicrosoftLoggerProvider>());
     }
 
     [Fact]

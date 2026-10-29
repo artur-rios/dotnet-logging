@@ -166,17 +166,19 @@ public class StandaloneLoggerTests
     }
 
     [Fact]
-    public void GivenStandaloneLoggerWithException_WhenExceptionLogged_ThenLogsExceptionMessage()
+    public void GivenStandaloneLoggerWithException_WhenExceptionLogged_ThenLogsExceptionToString()
     {
         var logger = new TestStandaloneLogger();
-        var ex = new InvalidOperationException("something went wrong");
+        var ex = ThrownException();
 
         logger.Exception(ex, filePath: "path/exception.cs", methodName: "ExceptionMethod");
 
         var call = Assert.Single(logger.Dummy.Calls);
 
         Assert.Equal(CustomLogLevel.Exception, call.Level);
-        Assert.Equal("something went wrong", call.Message);
+        Assert.Equal(ex.ToString(), call.Message);
+        Assert.Contains(nameof(InvalidOperationException), call.Message);
+        Assert.Contains(nameof(ThrownException), call.Message);
         Assert.Equal("path/exception.cs", call.File);
         Assert.Equal("ExceptionMethod", call.Method);
     }
@@ -303,5 +305,35 @@ public class StandaloneLoggerTests
 
         Assert.EndsWith("StandaloneLoggerTests.cs", call.File);
         Assert.Equal("GivenStandaloneLogger_WhenTraceLoggedWithoutExplicitCaller_ThenUsesCallerInfo", call.Method);
+    }
+
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static InvalidOperationException ThrownException()
+    {
+        try
+        {
+            throw new InvalidOperationException("something went wrong");
+        }
+        catch (InvalidOperationException exception)
+        {
+            return exception;
+        }
+    }
+
+    [Fact]
+    public void GivenANullException_WhenExceptionLogged_ThenArgumentNullExceptionIsThrown()
+    {
+        var logger = new TestStandaloneLogger();
+
+        Assert.Throws<ArgumentNullException>(() => logger.Exception(null!, filePath: "fp", methodName: "mn"));
+        Assert.Empty(logger.Dummy.Calls);
+    }
+
+    [Fact]
+    public void GivenNullConfigurations_WhenStandaloneLoggerConstructed_ThenArgumentNullExceptionIsThrown()
+    {
+        var exception = Assert.Throws<ArgumentNullException>(() => new StandaloneLogger(null!));
+
+        Assert.Equal("configurations", exception.ParamName);
     }
 }

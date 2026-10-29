@@ -22,8 +22,11 @@ public class StandaloneLogger : IStandaloneLogger
     /// Initializes a new instance of the <see cref="StandaloneLogger"/> class with the specified configurations.
     /// </summary>
     /// <param name="configurations">The list of logger configurations to use.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="configurations"/>, or one of its items, is <c>null</c>.</exception>
     public StandaloneLogger(List<LoggerConfiguration> configurations)
     {
+        ArgumentNullException.ThrowIfNull(configurations);
+
         foreach (var config in configurations)
         {
             _loggers.Add(InternalLoggerFactory.Create(config));
@@ -108,15 +111,22 @@ public class StandaloneLogger : IStandaloneLogger
     /// <summary>
     /// Logs an exception with automatic caller information capture.
     /// </summary>
+    /// <remarks>
+    /// The entry carries <see cref="System.Exception.ToString"/> — type, message, inner exceptions and stack trace —
+    /// as <see cref="StateLogger.Exception"/> does.
+    /// </remarks>
     /// <param name="exception">The exception to log.</param>
     /// <param name="filePath">The source file path (automatically captured).</param>
     /// <param name="methodName">The calling method name (automatically captured).</param>
     public void Exception(Exception exception, [CallerFilePath] string filePath = "unknown",
         [CallerMemberName] string methodName = "unknown")
     {
+        ArgumentNullException.ThrowIfNull(exception);
+
+        var msg = FormatMessageWithTraceId(exception.ToString());
         foreach (var logger in _loggers)
         {
-            logger.Exception(FormatMessageWithTraceId(exception.Message), filePath, methodName);
+            logger.Exception(msg, filePath, methodName);
         }
     }
 

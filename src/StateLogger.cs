@@ -21,8 +21,11 @@ public class StateLogger : IStateLogger
     /// Initializes a new instance of the <see cref="StateLogger"/> class with the specified configurations.
     /// </summary>
     /// <param name="configurations">The list of logger configurations to use.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="configurations"/>, or one of its items, is <c>null</c>.</exception>
     public StateLogger(List<LoggerConfiguration> configurations)
     {
+        ArgumentNullException.ThrowIfNull(configurations);
+
         foreach (var config in configurations)
         {
             _loggers.Add(InternalLoggerFactory.Create(config));
@@ -106,8 +109,10 @@ public class StateLogger : IStateLogger
     /// <param name="state">Optional state object containing caller information.</param>
     public void Exception(Exception exception, object? state = null)
     {
+        ArgumentNullException.ThrowIfNull(exception);
+
         var (fp, mn) = ResolveCallerInfo(state);
-        var msg = FormatMessageWithTraceId(exception.ToString() ?? exception.Message);
+        var msg = FormatMessageWithTraceId(exception.ToString());
         foreach (var logger in _loggers)
         {
             logger.Exception(msg, fp, mn);
@@ -174,7 +179,8 @@ public class StateLogger : IStateLogger
                 methodName = value.ToString();
             }
 
-            if (filePath != null && methodName != null) break;
+            if (filePath != null && methodName != null)
+                break;
         }
 
         return (filePath ?? "unknown", methodName ?? "unknown");

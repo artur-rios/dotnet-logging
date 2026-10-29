@@ -48,7 +48,7 @@ public class MicrosoftLoggerAdapterTests
         var call = capturing.Calls.First();
 
         Assert.Equal("Info", call.Method);
-        Assert.Equal("trace-123", capturing.TraceId);
+        Assert.Equal("trace-123", capturing.LastTraceId);
 
         var pairs = (IEnumerable<KeyValuePair<string, object>>)call.State!;
 

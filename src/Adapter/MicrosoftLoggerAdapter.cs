@@ -67,19 +67,14 @@ public class MicrosoftLoggerAdapter(IServiceProvider services) : ILogger
         Exception? exception,
         Func<TState, Exception?, string>? formatter)
     {
-        if (!IsEnabled(logLevel)) return;
+        if (!IsEnabled(logLevel))
+            return;
 
         var message = formatter != null ? formatter(state!, exception) : state?.ToString() ?? string.Empty;
 
         // Resolve the scoped IStateLogger (if not registered you'll get null)
         using var scope = _services.CreateScope();
         var stateLogger = scope.ServiceProvider.GetService<IStateLogger>();
-
-        // Propagate the ambient correlation id, whether set explicitly or carried by the current activity.
-        if (stateLogger is not null && TraceId is { } ambientTraceId)
-        {
-            stateLogger.TraceId = ambientTraceId;
-        }
 
         if (stateLogger is null)
         {
@@ -109,6 +104,34 @@ public class MicrosoftLoggerAdapter(IServiceProvider services) : ILogger
             enrichedState = kvList.ToArray();
         }
 
+        // The ambient correlation id, whether set explicitly or carried by the current activity, reaches the
+        // output through IStateLogger.TraceId — a plain property. A singleton state logger is shared by every
+        // entry, so the id is set, used and put back under a lock on the instance: otherwise a concurrent entry
+        // could be written with this entry's id, and a later entry without an ambient id would inherit it.
+        // A scoped state logger is a fresh instance per entry here, so the lock is never contended.
+        lock (stateLogger)
+        {
+            var previousTraceId = stateLogger.TraceId;
+
+            if (TraceId is { } ambientTraceId)
+            {
+                stateLogger.TraceId = ambientTraceId;
+            }
+
+            try
+            {
+                Forward(stateLogger, logLevel, message, exception, enrichedState);
+            }
+            finally
+            {
+                stateLogger.TraceId = previousTraceId;
+            }
+        }
+    }
+
+    private static void Forward(IStateLogger stateLogger, LogLevel logLevel, string message, Exception? exception,
+        object? enrichedState)
+    {
         if (exception is not null)
         {
             stateLogger.Exception(exception, enrichedState);
@@ -171,7 +194,8 @@ public class MicrosoftLoggerAdapter(IServiceProvider services) : ILogger
                 hasMember = true;
             }
 
-            if (hasFile && hasMember) return true;
+            if (hasFile && hasMember)
+                return true;
         }
 
         return false;
@@ -187,9 +211,11 @@ public class MicrosoftLoggerAdapter(IServiceProvider services) : ILogger
             {
                 var frame = st.GetFrame(i);
                 var method = frame?.GetMethod();
-                if (method == null) continue;
+                if (method == null)
+                    continue;
                 var declaring = method.DeclaringType;
-                if (declaring == null) continue;
+                if (declaring == null)
+                    continue;
 
                 var ns = declaring.Namespace ?? string.Empty;
 

@@ -101,11 +101,30 @@ public sealed class FileLoggerFolderSchemeTests : IDisposable
     [InlineData(LogSplitLevel.Hour, "TestApp_{0:yyyy_MM_dd_HH}.log")]
     public void GivenASplitLevel_WhenWriting_ThenTheFileIsNamedForThatPeriod(LogSplitLevel split, string expected)
     {
+        // The clock is read on both sides of the write, so a write that straddles the turn of an hour (or day, ...)
+        // does not fail the test.
+        var before = DateTime.UtcNow;
         new FileLogger(Configuration(LogFolderScheme.AllInOne, split)).Info("entry", "Caller.cs", "Method");
+        var after = DateTime.UtcNow;
 
         var file = Assert.Single(LogFiles());
 
-        Assert.Equal(string.Format(expected, DateTime.UtcNow), Path.GetFileName(file));
+        Assert.Contains(Path.GetFileName(file), new[] { string.Format(expected, before), string.Format(expected, after) });
+    }
+
+    [Fact]
+    public void GivenAnHourlySplit_WhenWriting_ThenTheEntryTimestampFallsInTheFilesPeriod()
+    {
+        var logger = new FileLogger(Configuration(LogFolderScheme.ByHour, LogSplitLevel.Hour));
+
+        logger.Info("entry", "Caller.cs", "Method");
+
+        var file = Assert.Single(LogFiles());
+        var stamp = File.ReadAllText(file).Split(" | ")[2];
+        var timestamp = DateTime.Parse(stamp, null, System.Globalization.DateTimeStyles.RoundtripKind);
+
+        Assert.Equal($"TestApp_{timestamp:yyyy_MM_dd_HH}.log", Path.GetFileName(file));
+        Assert.Equal(timestamp.Hour.ToString("D2"), Path.GetFileName(Path.GetDirectoryName(file)));
     }
 
     [Fact]
