@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-10-29
+
 ### Changed
 
 - `StandaloneLogger.Exception` logs the exception's `ToString()` — type, message, inner exceptions and stack trace —
@@ -95,7 +97,8 @@ effect on this library.
 - `StandaloneLogger` and `StateLogger` to use the loggers on their own or as part of a logging state.
 - `MicrosoftLoggerAdapter` and `MicrosoftLoggerProvider` to plug the loggers into `Microsoft.Extensions.Logging`.
 
-[Unreleased]: https://github.com/artur-rios/dotnet-logging/compare/2.0.0...HEAD
+[Unreleased]: https://github.com/artur-rios/dotnet-logging/compare/2.0.1...HEAD
+[2.0.1]: https://github.com/artur-rios/dotnet-logging/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/artur-rios/dotnet-logging/compare/v1.1.0...2.0.0
 [1.1.0]: https://github.com/artur-rios/dotnet-logging/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/artur-rios/dotnet-logging/releases/tag/v1.0.0
