@@ -1,16 +1,8 @@
 # Dotnet Logging
 
-> [!NOTE]
-> This is the real, open-source code of dotnet-logging. Its home is Forgejo, at
-> https://git.techcraftsmen.net/artur-rios/dotnet-logging; the copy on GitHub is a read-only mirror, for viewing only, and
-> its issues and pull requests are not followed. If you want to contribute, email me at
-> arturdev@duck.com.
-
 [![Docs](https://img.shields.io/badge/docs-website-blue)](https://docs.artur-rios.tech/dotnet-logging)
 [![License: Attribution](https://img.shields.io/badge/License-Attribution-blue.svg)](https://github.com/artur-rios/dotnet-logging/blob/main/LICENSE)
 [![NuGet](https://img.shields.io/nuget/v/ArturRios.Logging.svg)](https://www.nuget.org/packages/ArturRios.Logging)
-
-This repository lives at <https://git.techcraftsmen.net/artur-rios/dotnet-logging>. The GitHub repository is a read-only mirror of it.
 
 A flexible and feature-rich logging library for .NET applications. This library provides multiple logger implementations (Console and File), automatic caller information capture, custom log levels, and seamless integration with Microsoft.Extensions.Logging.
 
@@ -306,6 +298,9 @@ Notable changes in each release are recorded in [CHANGELOG.md](https://github.co
 
 Contributions are welcome! Building from source, running the tests, the branching model and the release process are
 described in [CONTRIBUTING.md](https://github.com/artur-rios/dotnet-logging/blob/main/CONTRIBUTING.md).
+
+The GitHub repository is a read-only mirror for the real, open-source code of dotnet-logging. Its home is Forgejo, at
+https://git.techcraftsmen.net/artur-rios/dotnet-logging. If you want to contribute, e-mail me at arturdev@duck.com.
 
 ## Legal Details
 
