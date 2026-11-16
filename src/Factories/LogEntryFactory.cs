@@ -15,6 +15,10 @@ public static class LogEntryFactory
     /// <param name="methodName">The calling method name.</param>
     /// <param name="message">The log message.</param>
     /// <returns>A formatted log entry string.</returns>
+    /// <remarks>
+    /// The entry starts with the level's name, such as <c>INFO</c>. A value outside <see cref="CustomLogLevel"/>
+    /// has no name, so it is written as its number, such as <c>42</c>.
+    /// </remarks>
     public static string Create(CustomLogLevel level, string filePath, string methodName, string message)
         => Create(level, filePath, methodName, message, DateTime.UtcNow);
 
@@ -25,7 +29,8 @@ public static class LogEntryFactory
     internal static string Create(CustomLogLevel level, string filePath, string methodName, string message,
         DateTime timestamp)
     {
-        var logLevel = level.GetDescription()!;
+        // An undefined level has no description: its number keeps the entry's level field from being empty.
+        var logLevel = level.GetDescription() ?? level.ToString();
         var className = Path.GetFileNameWithoutExtension(filePath);
 
         return $"{logLevel}: {className} | {methodName} | {timestamp:o} | {message}{Environment.NewLine}";

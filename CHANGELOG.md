@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   Buddhist one, and processes running under different cultures wrote the same day to different files.
 - An empty `FileLoggerConfiguration.FilePath` is the current directory. With the `AllInOne` folder scheme, which
   leaves a bare file name, every write threw `ArgumentException` instead.
+- `LogEntryFactory.Create` writes a level outside `CustomLogLevel` as its number, as in `42: OrderService | …`. It
+  wrote an empty level name, so the entry started with `: `.
 
 ## [2.0.2] - 2026-11-14
 

@@ -49,6 +49,16 @@ public class LogEntryFactoryTests
     }
 
     [Fact]
+    public void GivenALevelOutsideTheEnum_WhenAnEntryIsCreated_ThenItIsNamedByItsNumber()
+    {
+        var timestamp = new DateTime(2025, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
+
+        var result = LogEntryFactory.Create((CustomLogLevel)42, "A.cs", "M", "msg", timestamp);
+
+        Assert.Equal($"42: A | M | {timestamp:o} | msg{Environment.NewLine}", result);
+    }
+
+    [Fact]
     public void GivenNoTimestamp_WhenAnEntryIsCreated_ThenItIsStampedWithTheCurrentUtcTime()
     {
         var before = DateTime.UtcNow;
