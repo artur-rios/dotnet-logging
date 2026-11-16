@@ -1,305 +1,189 @@
-﻿using ArturRios.Logging.Configuration;
+using System.Text.RegularExpressions;
+using ArturRios.Logging.Configuration;
 using ArturRios.Logging.Interfaces;
 using ArturRios.Logging.Loggers;
+using ArturRios.Logging.Tests.Helpers;
+using ArturRios.Util.Collections;
 
 namespace ArturRios.Logging.Tests.Loggers;
 
+/// <summary>
+/// What <see cref="ConsoleLogger"/> writes to the console, read back from <see cref="Console.Out"/>. The class is in
+/// <see cref="ConsoleOutputCollection"/>, since the console is the process's.
+/// </summary>
 [Trait("Category", "Unit")]
+[Collection(ConsoleOutputCollection.Name)]
 public class ConsoleLoggerTests
 {
-    private readonly ConsoleLoggerConfiguration _configuration = new() { UseColors = false };
+    private const string Reset = "\e[0m";
 
-    [Fact]
-    public void GivenConsoleLogger_WhenCreated_ThenImplementsIInternalLogger()
+    private static readonly ConsoleLoggerConfiguration Plain = new() { UseColors = false };
+    private static readonly ConsoleLoggerConfiguration Colored = new() { UseColors = true };
+
+    /// <summary>Each level: the method that logs it, the name the entry carries and the color it is written in.</summary>
+    public static TheoryData<string, string, string> Levels => new()
     {
-        var logger = new ConsoleLogger(_configuration);
-        Assert.IsType<IInternalLogger>(logger, exactMatch: false);
-    }
+        { nameof(IInternalLogger.Trace), "TRACE", AnsiColors.DarkGray },
+        { nameof(IInternalLogger.Debug), "DEBUG", AnsiColors.Cyan },
+        { nameof(IInternalLogger.Info), "INFO", AnsiColors.Green },
+        { nameof(IInternalLogger.Warn), "WARN", AnsiColors.Yellow },
+        { nameof(IInternalLogger.Error), "ERROR", AnsiColors.Red },
+        { nameof(IInternalLogger.Exception), "EXCEPTION", AnsiColors.Magenta },
+        { nameof(IInternalLogger.Critical), "CRITICAL", AnsiColors.BrightRed },
+        { nameof(IInternalLogger.Fatal), "FATAL", AnsiColors.BrightRed }
+    };
 
-    [Fact]
-    public void GivenConsoleLoggerConfiguration_WhenConsoleLoggerCreated_ThenAcceptsConfiguration()
+    private static void Log(IInternalLogger logger, string method, string message, string filePath = "src/Caller.cs",
+        string methodName = "Run")
     {
-        var config = new ConsoleLoggerConfiguration { UseColors = true };
-        var logger = new ConsoleLogger(config);
-
-        Assert.NotNull(logger);
-    }
-
-    [Fact]
-    public void GivenConsoleLogger_WhenInspected_ThenHasTraceMethod()
-    {
-        var logger = new ConsoleLogger(_configuration);
-
-        logger.Trace("test message", "TestFile.cs", "TestMethod");
-    }
-
-    [Fact]
-    public void GivenConsoleLogger_WhenInspected_ThenHasDebugMethod()
-    {
-        var logger = new ConsoleLogger(_configuration);
-
-        logger.Debug("test message", "TestFile.cs", "TestMethod");
-    }
-
-    [Fact]
-    public void GivenConsoleLogger_WhenInspected_ThenHasInfoMethod()
-    {
-        var logger = new ConsoleLogger(_configuration);
-
-        logger.Info("test message", "TestFile.cs", "TestMethod");
-    }
-
-    [Fact]
-    public void GivenConsoleLogger_WhenInspected_ThenHasWarnMethod()
-    {
-        var logger = new ConsoleLogger(_configuration);
-
-        logger.Warn("test message", "TestFile.cs", "TestMethod");
-    }
-
-    [Fact]
-    public void GivenConsoleLogger_WhenInspected_ThenHasErrorMethod()
-    {
-        var logger = new ConsoleLogger(_configuration);
-
-        logger.Error("test message", "TestFile.cs", "TestMethod");
-    }
-
-    [Fact]
-    public void GivenConsoleLogger_WhenInspected_ThenHasExceptionMethod()
-    {
-        var logger = new ConsoleLogger(_configuration);
-
-        logger.Exception("test message", "TestFile.cs", "TestMethod");
-    }
-
-    [Fact]
-    public void GivenConsoleLogger_WhenInspected_ThenHasCriticalMethod()
-    {
-        var logger = new ConsoleLogger(_configuration);
-
-        logger.Critical("test message", "TestFile.cs", "TestMethod");
-    }
-
-    [Fact]
-    public void GivenConsoleLogger_WhenInspected_ThenHasFatalMethod()
-    {
-        var logger = new ConsoleLogger(_configuration);
-
-        logger.Fatal("test message", "TestFile.cs", "TestMethod");
-    }
-
-    [Fact]
-    public void GivenConsoleLogger_WhenTraceLogged_ThenWritesWithoutException()
-    {
-        var logger = new ConsoleLogger(_configuration);
-        var exception = Record.Exception(() =>
-            logger.Trace("Trace message", "Program.cs", "Main")
-        );
-
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void GivenConsoleLogger_WhenDebugLogged_ThenWritesWithoutException()
-    {
-        var logger = new ConsoleLogger(_configuration);
-        var exception = Record.Exception(() =>
-            logger.Debug("Debug message", "Program.cs", "Main")
-        );
-
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void GivenConsoleLogger_WhenInfoLogged_ThenWritesWithoutException()
-    {
-        var logger = new ConsoleLogger(_configuration);
-        var exception = Record.Exception(() =>
-            logger.Info("Info message", "Program.cs", "Main")
-        );
-
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void GivenConsoleLogger_WhenWarnLogged_ThenWritesWithoutException()
-    {
-        var logger = new ConsoleLogger(_configuration);
-        var exception = Record.Exception(() =>
-            logger.Warn("Warning message", "Program.cs", "Main")
-        );
-
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void GivenConsoleLogger_WhenErrorLogged_ThenWritesWithoutException()
-    {
-        var logger = new ConsoleLogger(_configuration);
-        var exception = Record.Exception(() =>
-            logger.Error("Error message", "Program.cs", "Main")
-        );
-
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void GivenConsoleLogger_WhenExceptionLogged_ThenWritesWithoutException()
-    {
-        var logger = new ConsoleLogger(_configuration);
-        var exception = Record.Exception(() =>
-            logger.Exception("Exception message", "Program.cs", "Main")
-        );
-
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void GivenConsoleLogger_WhenCriticalLogged_ThenWritesWithoutException()
-    {
-        var logger = new ConsoleLogger(_configuration);
-        var exception = Record.Exception(() =>
-            logger.Critical("Critical message", "Program.cs", "Main")
-        );
-
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void GivenConsoleLogger_WhenFatalLogged_ThenWritesWithoutException()
-    {
-        var logger = new ConsoleLogger(_configuration);
-        var exception = Record.Exception(() =>
-            logger.Fatal("Fatal message", "Program.cs", "Main")
-        );
-
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void GivenConsoleLoggerWithColorsEnabled_WhenInfoLogged_ThenSupportsColoredOutput()
-    {
-        var configWithColors = new ConsoleLoggerConfiguration { UseColors = true };
-        var loggerWithColors = new ConsoleLogger(configWithColors);
-
-        var exception = Record.Exception(() =>
-            loggerWithColors.Info("Colored message", "Program.cs", "Main")
-        );
-
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void GivenConsoleLoggerWithColorsDisabled_WhenInfoLogged_ThenSupportsNonColoredOutput()
-    {
-        var configWithoutColors = new ConsoleLoggerConfiguration { UseColors = false };
-        var loggerWithoutColors = new ConsoleLogger(configWithoutColors);
-
-        var exception = Record.Exception(() =>
-            loggerWithoutColors.Info("Plain message", "Program.cs", "Main")
-        );
-
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void GivenConsoleLoggerWithEmptyMessage_WhenInfoLogged_ThenHandlesEmptyMessage()
-    {
-        var logger = new ConsoleLogger(_configuration);
-
-        var exception = Record.Exception(() =>
-            logger.Info(string.Empty, "Program.cs", "Main")
-        );
-
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void GivenConsoleLoggerWithNullMessage_WhenInfoLogged_ThenHandlesNullMessage()
-    {
-        var logger = new ConsoleLogger(_configuration);
-
-        try
+        switch (method)
         {
-            logger.Info(null!, "Program.cs", "Main");
-        }
-        catch (ArgumentNullException)
-        {
-            Assert.True(true);
+            case nameof(IInternalLogger.Trace):
+                logger.Trace(message, filePath, methodName);
+                break;
+            case nameof(IInternalLogger.Debug):
+                logger.Debug(message, filePath, methodName);
+                break;
+            case nameof(IInternalLogger.Info):
+                logger.Info(message, filePath, methodName);
+                break;
+            case nameof(IInternalLogger.Warn):
+                logger.Warn(message, filePath, methodName);
+                break;
+            case nameof(IInternalLogger.Error):
+                logger.Error(message, filePath, methodName);
+                break;
+            case nameof(IInternalLogger.Exception):
+                logger.Exception(message, filePath, methodName);
+                break;
+            case nameof(IInternalLogger.Critical):
+                logger.Critical(message, filePath, methodName);
+                break;
+            case nameof(IInternalLogger.Fatal):
+                logger.Fatal(message, filePath, methodName);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(method), method, null);
         }
     }
 
-    [Fact]
-    public void GivenConsoleLogger_WhenMultipleConsecutiveCallsMade_ThenHandlesMultipleConsecutiveLoggingCalls()
-    {
-        var logger = new ConsoleLogger(_configuration);
+    /// <summary>One entry, as <c>LogEntryFactory</c> formats it, with any timestamp.</summary>
+    private static Regex Entry(string level, string message, string className = "Caller", string methodName = "Run") =>
+        new($"^{level}: {Regex.Escape(className)} \\| {Regex.Escape(methodName)} \\| " +
+            $@"\d{{4}}-\d{{2}}-\d{{2}}T\d{{2}}:\d{{2}}:\d{{2}}\.\d{{7}}Z \| {Regex.Escape(message)}" +
+            $"{Regex.Escape(Environment.NewLine)}$");
 
-        var exception = Record.Exception(() =>
+    [Theory]
+    [MemberData(nameof(Levels))]
+    public void GivenColorsDisabled_WhenEachLevelIsLogged_ThenOnePlainEntryIsWritten(string method, string level, string _)
+    {
+        using var console = new ConsoleCapture();
+
+        Log(new ConsoleLogger(Plain), method, "the message");
+
+        Assert.Matches(Entry(level, "the message"), console.Output);
+    }
+
+    [Theory]
+    [MemberData(nameof(Levels))]
+    public void GivenColorsEnabled_WhenEachLevelIsLogged_ThenTheEntryIsWrittenInItsColorFollowedByAReset(
+        string method, string level, string color)
+    {
+        using var console = new ConsoleCapture();
+
+        Log(new ConsoleLogger(Colored), method, "the message");
+
+        var output = console.Output;
+        Assert.StartsWith(color, output);
+        Assert.EndsWith(Reset, output);
+        Assert.Matches(Entry(level, "the message"), output[color.Length..^Reset.Length]);
+    }
+
+    [Fact]
+    public void GivenColorsDisabled_WhenLogged_ThenNoEscapeSequenceIsWritten()
+    {
+        using var console = new ConsoleCapture();
+
+        new ConsoleLogger(Plain).Error("plain", "Caller.cs", "Run");
+
+        Assert.DoesNotContain('\e', console.Output);
+    }
+
+    [Fact]
+    public void GivenADefaultConfiguration_WhenLogged_ThenTheEntryIsColored()
+    {
+        using var console = new ConsoleCapture();
+
+        new ConsoleLogger(new ConsoleLoggerConfiguration()).Info("colored", "Caller.cs", "Run");
+
+        Assert.StartsWith(AnsiColors.Green, console.Output);
+    }
+
+    [Theory]
+    [InlineData("C:\\src\\Orders\\OrderService.cs", "OrderService")]
+    [InlineData("/home/ci/src/OrderService.cs", "OrderService")]
+    [InlineData("unknown", "unknown")]
+    public void GivenACallerFilePath_WhenLogged_ThenTheEntryNamesTheFileWithoutItsFolderOrExtension(
+        string filePath, string className)
+    {
+        if (filePath.Contains('\\') && !OperatingSystem.IsWindows())
         {
-            logger.Trace("First message", "File1.cs", "Method1");
-            logger.Debug("Second message", "File2.cs", "Method2");
-            logger.Info("Third message", "File3.cs", "Method3");
-            logger.Error("Fourth message", "File4.cs", "Method4");
+            // A Windows path is one file name elsewhere: there, only '/' separates folders.
+            className = Path.GetFileNameWithoutExtension(filePath);
+        }
+
+        using var console = new ConsoleCapture();
+
+        new ConsoleLogger(Plain).Info("m", filePath, "Run");
+
+        Assert.Matches(Entry("INFO", "m", className), console.Output);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("tab\there | pipes, ünïcödé ✓ and \"quotes\"")]
+    [InlineData("two\nlines")]
+    public void GivenAnyMessage_WhenLogged_ThenItIsWrittenAsItIs(string message)
+    {
+        using var console = new ConsoleCapture();
+
+        new ConsoleLogger(Plain).Info(message, "Caller.cs", "Run");
+
+        Assert.Matches(Entry("INFO", message), console.Output);
+    }
+
+    [Fact]
+    public void GivenANullMessage_WhenLogged_ThenTheEntryHasAnEmptyMessage()
+    {
+        using var console = new ConsoleCapture();
+
+        new ConsoleLogger(Plain).Info(null!, "Caller.cs", "Run");
+
+        Assert.Matches(Entry("INFO", string.Empty), console.Output);
+    }
+
+    [Fact]
+    public void GivenSeveralThreads_WhenEachLogsManyEntries_ThenEveryEntryIsWrittenWholeOnItsOwnLine()
+    {
+        using var console = new ConsoleCapture();
+        var logger = new ConsoleLogger(Colored);
+
+        Parallel.For(0, 8, thread =>
+        {
+            for (var i = 0; i < 25; i++)
+            {
+                logger.Info($"thread {thread} entry {i}", "Caller.cs", "Run");
+            }
         });
 
-        Assert.Null(exception);
-    }
+        var entries = console.Output.Split(Reset, StringSplitOptions.RemoveEmptyEntries);
 
-    [Fact]
-    public void GivenConsoleLoggerWithSpecialCharacters_WhenInfoLogged_ThenAllowsLoggingWithSpecialCharacters()
-    {
-        var logger = new ConsoleLogger(_configuration);
-
-        var exception = Record.Exception(() =>
-            logger.Info("Message with special chars: !@#$%^&*()_+-=[]{}|;:',.<>?", "Program.cs", "Main")
-        );
-
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void GivenConsoleLoggerWithUnicodeCharacters_WhenInfoLogged_ThenAllowsLoggingWithUnicodeCharacters()
-    {
-        var logger = new ConsoleLogger(_configuration);
-
-        var exception = Record.Exception(() =>
-            logger.Info("Message with unicode: 你好世界 مرحبا العالم 🎉", "Program.cs", "Main")
-        );
-
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void GivenConsoleLoggerWithLongMessage_WhenInfoLogged_ThenAllowsLoggingWithLongMessage()
-    {
-        var logger = new ConsoleLogger(_configuration);
-        var longMessage = string.Concat(Enumerable.Repeat("This is a very long message. ", 100));
-
-        var exception = Record.Exception(() =>
-            logger.Info(longMessage, "Program.cs", "Main")
-        );
-
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void GivenConsoleLoggerWithConcurrentCalls_WhenMultipleThreadsLog_ThenIsThreadSafe()
-    {
-        var logger = new ConsoleLogger(_configuration);
-        var tasks = new List<Task>();
-
-        for (int i = 0; i < 10; i++)
+        Assert.Equal(200, entries.Length);
+        Assert.All(entries, entry =>
         {
-            int index = i;
-            tasks.Add(Task.Run(() =>
-                logger.Info($"Message {index}", "Program.cs", "Main")
-            ));
-        }
-
-        var exception = Record.Exception(() => Task.WaitAll(tasks.ToArray()));
-        Assert.Null(exception);
+            Assert.StartsWith(AnsiColors.Green, entry);
+            Assert.Matches(new Regex($@"^INFO: Caller \| Run \| \S+ \| thread \d entry \d+{Regex.Escape(Environment.NewLine)}$"),
+                entry[AnsiColors.Green.Length..]);
+        });
     }
 }
-
-

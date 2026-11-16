@@ -38,7 +38,7 @@ public class SharedStateLoggerTraceIdTests
         {
             var adapter = new MicrosoftLoggerAdapter(sp) { TraceId = "earlier-request" };
             Log(adapter, "first");
-        });
+        }, TestContext.Current.CancellationToken);
 
         Assert.Null(Activity.Current);
         Log(new MicrosoftLoggerAdapter(sp), "second");

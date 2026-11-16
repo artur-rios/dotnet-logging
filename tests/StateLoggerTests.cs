@@ -1,20 +1,8 @@
 using ArturRios.Logging.Configuration;
 using ArturRios.Logging.Interfaces;
+using ArturRios.Logging.Tests.Helpers;
 
 namespace ArturRios.Logging.Tests;
-
-internal class DummyInternalLogger2 : IInternalLogger
-{
-    public readonly List<(CustomLogLevel Level, string Message, string File, string Method)> Calls = new();
-    public void Trace(string message, string filePath, string methodName) => Calls.Add((CustomLogLevel.Trace, message, filePath, methodName));
-    public void Debug(string message, string filePath, string methodName) => Calls.Add((CustomLogLevel.Debug, message, filePath, methodName));
-    public void Info(string message, string filePath, string methodName) => Calls.Add((CustomLogLevel.Information, message, filePath, methodName));
-    public void Warn(string message, string filePath, string methodName) => Calls.Add((CustomLogLevel.Warning, message, filePath, methodName));
-    public void Error(string message, string filePath, string methodName) => Calls.Add((CustomLogLevel.Error, message, filePath, methodName));
-    public void Exception(string message, string filePath, string methodName) => Calls.Add((CustomLogLevel.Exception, message, filePath, methodName));
-    public void Critical(string message, string filePath, string methodName) => Calls.Add((CustomLogLevel.Critical, message, filePath, methodName));
-    public void Fatal(string message, string filePath, string methodName) => Calls.Add((CustomLogLevel.Fatal, message, filePath, methodName));
-}
 
 [Trait("Category", "Unit")]
 public class StateLoggerTests
@@ -26,11 +14,11 @@ public class StateLoggerTests
             var field = typeof(StateLogger).GetField("_loggers", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
             var list = (List<IInternalLogger>)field.GetValue(this)!;
             list.Clear();
-            Dummy = new DummyInternalLogger2();
+            Dummy = new RecordingInternalLogger();
             list.Add(Dummy);
         }
 
-        public DummyInternalLogger2 Dummy { get; }
+        public RecordingInternalLogger Dummy { get; }
     }
 
     [Fact]
@@ -434,7 +422,7 @@ public class StateLoggerTests
     public void GivenStateLoggerWithMultipleInternalLoggers_WhenInfoLogged_ThenForwardsToAllConfiguredLoggers()
     {
         var logger = new TestStateLogger();
-        var dummy2 = new DummyInternalLogger2();
+        var dummy2 = new RecordingInternalLogger();
 
         var field = typeof(StateLogger).GetField("_loggers", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
         var list = (List<IInternalLogger>)field.GetValue(logger)!;
@@ -452,5 +440,40 @@ public class StateLoggerTests
         var exception = Assert.Throws<ArgumentNullException>(() => new StateLogger(null!));
 
         Assert.Equal("configurations", exception.ParamName);
+    }
+
+    [Fact]
+    public void GivenNoConfigurations_WhenEveryLevelIsLogged_ThenNothingThrows()
+    {
+        var logger = new StateLogger([]) { TraceId = "t" };
+
+        var exception = Record.Exception(() =>
+        {
+            logger.Trace("m");
+            logger.Debug("m");
+            logger.Info("m");
+            logger.Warn("m");
+            logger.Error("m");
+            logger.Exception(new InvalidOperationException("e"));
+            logger.Critical("m");
+            logger.Fatal("m");
+        });
+
+        Assert.Null(exception);
+    }
+
+    [Theory]
+    [InlineData("CallerFilePath", "Caller.cs", "Caller.cs", "unknown")]
+    [InlineData("CallerMemberName", "Run", "unknown", "Run")]
+    public void GivenStateWithOnlyOneHalfOfTheCaller_WhenLogged_ThenTheOtherHalfIsUnknown(
+        string key, string value, string expectedFile, string expectedMethod)
+    {
+        var logger = new TestStateLogger();
+
+        logger.Info("m", new[] { new KeyValuePair<string, object>(key, value) });
+
+        var call = Assert.Single(logger.Dummy.Calls);
+        Assert.Equal(expectedFile, call.File);
+        Assert.Equal(expectedMethod, call.Method);
     }
 }
