@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `FileLogger` names its files with the Gregorian date whatever the current culture. Under a culture with a calendar
   of its own, such as th-TH, it wrote `2026\App_2569_11_16.log`: the folder had the Gregorian year and the file the
   Buddhist one, and processes running under different cultures wrote the same day to different files.
+- An empty `FileLoggerConfiguration.FilePath` is the current directory. With the `AllInOne` folder scheme, which
+  leaves a bare file name, every write threw `ArgumentException` instead.
 
 ## [2.0.2] - 2026-11-14
 

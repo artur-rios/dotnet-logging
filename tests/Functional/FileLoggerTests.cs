@@ -111,6 +111,28 @@ public sealed class FileLoggerTests : IDisposable
     }
 
     [Fact]
+    public void GivenAnEmptyFilePath_WhenWritten_ThenTheFileGoesToTheCurrentDirectory()
+    {
+        // A name of its own, so the file in the shared current directory cannot be another test's.
+        var configuration = Configuration();
+        configuration.ApplicationName = "TestApp_" + Guid.NewGuid().ToString("N");
+        configuration.FilePath = "";
+        var file = Path.Combine(Environment.CurrentDirectory, configuration.ApplicationName + ".log");
+
+        try
+        {
+            new FileLogger(configuration).Info("entry", "Caller.cs", "Method");
+
+            var line = Assert.Single(File.ReadAllLines(file));
+            Assert.EndsWith(" | entry", line);
+        }
+        finally
+        {
+            File.Delete(file);
+        }
+    }
+
+    [Fact]
     public void GivenAFolderSchemeOutsideTheEnum_WhenWritten_ThenItThrowsAndWritesNothing()
     {
         var configuration = Configuration();

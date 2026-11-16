@@ -91,7 +91,9 @@ public class FileLogger(FileLoggerConfiguration configuration) : IInternalLogger
     {
         var directory = Path.GetDirectoryName(path);
 
-        if (directory is not null && !Directory.Exists(directory))
+        // An empty directory is the current one: an empty FilePath with no dated folders leaves a bare file name,
+        // relative like any other FilePath, and Directory.CreateDirectory("") throws.
+        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
         {
             Directory.CreateDirectory(directory);
         }
