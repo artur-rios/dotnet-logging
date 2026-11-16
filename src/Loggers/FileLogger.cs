@@ -1,4 +1,5 @@
-﻿using ArturRios.Logging.Configuration;
+﻿using System.Globalization;
+using ArturRios.Logging.Configuration;
 using ArturRios.Logging.Factories;
 using ArturRios.Logging.Interfaces;
 
@@ -90,7 +91,9 @@ public class FileLogger(FileLoggerConfiguration configuration) : IInternalLogger
     {
         var directory = Path.GetDirectoryName(path);
 
-        if (directory is not null && !Directory.Exists(directory))
+        // An empty directory is the current one: an empty FilePath with no dated folders leaves a bare file name,
+        // relative like any other FilePath, and Directory.CreateDirectory("") throws.
+        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
         {
             Directory.CreateDirectory(directory);
         }
@@ -136,15 +139,20 @@ public class FileLogger(FileLoggerConfiguration configuration) : IInternalLogger
         return path;
     }
 
+    // The date is formatted with the invariant culture: under the current one, a culture with a calendar of its
+    // own (th-TH's Buddhist year 2569, fa-IR's Persian 1405) named the file differently from its Gregorian folder,
+    // and two processes with different cultures wrote the same day to different files.
     private string BuildFileName(DateTime timestamp)
     {
+        var invariant = CultureInfo.InvariantCulture;
+
         return configuration.FileSplitLevel switch
         {
             LogSplitLevel.Request => configuration.ApplicationName,
-            LogSplitLevel.Year => $"{configuration.ApplicationName}_{timestamp:yyyy}",
-            LogSplitLevel.Month => $"{configuration.ApplicationName}_{timestamp:yyyy_MM}",
-            LogSplitLevel.Day => $"{configuration.ApplicationName}_{timestamp:yyyy_MM_dd}",
-            LogSplitLevel.Hour => $"{configuration.ApplicationName}_{timestamp:yyyy_MM_dd_HH}",
+            LogSplitLevel.Year => string.Create(invariant, $"{configuration.ApplicationName}_{timestamp:yyyy}"),
+            LogSplitLevel.Month => string.Create(invariant, $"{configuration.ApplicationName}_{timestamp:yyyy_MM}"),
+            LogSplitLevel.Day => string.Create(invariant, $"{configuration.ApplicationName}_{timestamp:yyyy_MM_dd}"),
+            LogSplitLevel.Hour => string.Create(invariant, $"{configuration.ApplicationName}_{timestamp:yyyy_MM_dd_HH}"),
             _ => throw new ArgumentOutOfRangeException(
                 nameof(configuration), configuration.FileSplitLevel, "Unknown log split level.")
         };

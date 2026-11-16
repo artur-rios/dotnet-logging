@@ -111,7 +111,7 @@ public sealed class FileLoggerFolderSchemeTests : IDisposable
     {
         // The clock is read on both sides of the write, so a write that straddles the turn of an hour (or day, ...)
         // does not fail the test.
-        // Pinned to the owner's culture: a file name is formatted with the current culture's calendar.
+        // Pinned to the owner's culture, so a name that followed the current culture would be caught here too.
         using var culture = new CultureScope("pt-BR");
         var before = DateTime.UtcNow;
         new FileLogger(Configuration(LogFolderScheme.AllInOne, split)).Info("entry", "Caller.cs", "Method");
@@ -124,6 +124,24 @@ public sealed class FileLoggerFolderSchemeTests : IDisposable
             string.Format(CultureInfo.InvariantCulture, expected, before),
             string.Format(CultureInfo.InvariantCulture, expected, after)
         });
+    }
+
+    [Theory]
+    [InlineData("th-TH")] // a Buddhist calendar: its year is 543 ahead of the Gregorian one
+    [InlineData("fa-IR")] // a Persian calendar, with years and months of its own
+    [InlineData("")]
+    public void GivenACultureWithItsOwnCalendar_WhenWriting_ThenTheFileNameIsGregorianLikeItsFolder(string culture)
+    {
+        using var scope = new CultureScope(culture);
+        new FileLogger(Configuration(LogFolderScheme.ByYear, LogSplitLevel.Day)).Info("entry", "Caller.cs", "Method");
+
+        var file = Assert.Single(LogFiles());
+        var stamp = File.ReadAllText(file).Split(" | ")[2];
+        var timestamp = DateTime.Parse(stamp, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+
+        Assert.Equal(
+            Path.Combine(_root, $"{timestamp.Year}", $"TestApp_{timestamp.Year}_{timestamp.Month:D2}_{timestamp.Day:D2}.log"),
+            file);
     }
 
     [Fact]
