@@ -496,7 +496,7 @@ public class LoggerCallerExtensionsTests
             Times.Once);
     }
 
-    private static bool ValidateState(object state, string expectedFilePath, string expectedMemberName, string expectedMessage)
+    private static bool ValidateState(object? state, string expectedFilePath, string expectedMemberName, string expectedMessage)
     {
         if (state is not KeyValuePair<string, object>[] kvpArray)
         {
