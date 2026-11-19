@@ -7,9 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [2.0.4] - 2026-11-19
+
 ### Changed
 
-- `ArturRios.Extensions` updated from 1.4.2 to 1.4.3 and `ArturRios.Util` from 2.2.1 to 2.3.0.
+- `ArturRios.Extensions` updated from 1.4.2 to 1.4.4 and `ArturRios.Util` from 2.2.1 to 2.3.1.
 
 ## [2.0.3] - 2026-11-19
 
@@ -137,7 +139,8 @@ effect on this library.
 - `StandaloneLogger` and `StateLogger` to use the loggers on their own or as part of a logging state.
 - `MicrosoftLoggerAdapter` and `MicrosoftLoggerProvider` to plug the loggers into `Microsoft.Extensions.Logging`.
 
-[Unreleased]: https://github.com/artur-rios/dotnet-logging/compare/2.0.3...HEAD
+[Unreleased]: https://github.com/artur-rios/dotnet-logging/compare/2.0.4...HEAD
+[2.0.4]: https://github.com/artur-rios/dotnet-logging/compare/2.0.3...2.0.4
 [2.0.3]: https://github.com/artur-rios/dotnet-logging/compare/2.0.2...2.0.3
 [2.0.2]: https://github.com/artur-rios/dotnet-logging/compare/2.0.1...2.0.2
 [2.0.1]: https://github.com/artur-rios/dotnet-logging/compare/2.0.0...2.0.1
