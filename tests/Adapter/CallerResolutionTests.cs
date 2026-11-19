@@ -95,4 +95,106 @@ public class CallerResolutionTests
 
         Assert.Equal(nameof(GivenTheCallerExtensions_WhenLoggingThroughTheAdapter_ThenTheExtensionIsNotReportedAsTheCaller), memberName);
     }
+
+    // What the entry line shows: LogEntryFactory takes the class from the file path's name.
+    private static (string ClassName, string MemberName) EntryCallerFrom(CapturingStateLogger capturing)
+    {
+        var (filePath, memberName) = CallerFrom(capturing);
+
+        return (Path.GetFileNameWithoutExtension(filePath), memberName);
+    }
+
+    // StateLogger takes the first key that names the caller, so the order of the forwarded pairs decides it.
+    private static (string FilePath, string MemberName) FirstCallerFrom(CapturingStateLogger capturing)
+    {
+        var pairs = ((IEnumerable<KeyValuePair<string, object>>)capturing.Calls.First().State!).ToArray();
+
+        static bool Is(string key, params string[] names) =>
+            names.Any(name => string.Equals(key, name, StringComparison.OrdinalIgnoreCase));
+
+        return (
+            pairs.First(pair => Is(pair.Key, "CallerFilePath", "FilePath")).Value.ToString()!,
+            pairs.First(pair => Is(pair.Key, "CallerMemberName", "MemberName", "Method")).Value.ToString()!);
+    }
+
+    [Fact]
+    public void GivenACallerInANamespace_WhenLoggingThroughTheAdapter_ThenItsClassAndMethodAreReported()
+    {
+        var capturing = new CapturingStateLogger();
+
+        new SampleApp.Orders.OrderService(new MicrosoftLoggerAdapter(BuildProvider(capturing))).PlaceOrder();
+
+        Assert.Equal(("OrderService", "PlaceOrder"), EntryCallerFrom(capturing));
+    }
+
+    [Fact]
+    public async Task GivenAnAsyncCaller_WhenLoggingThroughTheAdapter_ThenTheAsyncMethodIsReportedNotMoveNext()
+    {
+        var capturing = new CapturingStateLogger();
+
+        await new SampleApp.Orders.OrderService(new MicrosoftLoggerAdapter(BuildProvider(capturing)))
+            .PlaceOrderAsync();
+
+        Assert.Equal(("OrderService", "PlaceOrderAsync"), EntryCallerFrom(capturing));
+    }
+
+    [Fact]
+    public void GivenALambdaCaller_WhenLoggingThroughTheAdapter_ThenTheEnclosingClassAndMethodAreReported()
+    {
+        var capturing = new CapturingStateLogger();
+
+        new SampleApp.Orders.OrderService(new MicrosoftLoggerAdapter(BuildProvider(capturing)))
+            .PlaceOrderFromLambda();
+
+        Assert.Equal(("OrderService", "PlaceOrderFromLambda"), EntryCallerFrom(capturing));
+    }
+
+    [Fact]
+    public void GivenAGenericCaller_WhenLoggingThroughTheAdapter_ThenItsClassIsReportedWithoutItsArity()
+    {
+        var capturing = new CapturingStateLogger();
+
+        new SampleApp.Orders.Repository<int>(new MicrosoftLoggerAdapter(BuildProvider(capturing))).Save();
+
+        Assert.Equal(("Repository", "Save"), EntryCallerFrom(capturing));
+    }
+
+    [Fact]
+    public void GivenATemplateWithAMethodPlaceholder_WhenLoggingThroughTheAdapter_ThenTheCallerIsStillReported()
+    {
+        var capturing = new CapturingStateLogger();
+
+        new SampleApp.Orders.OrderService(new MicrosoftLoggerAdapter(BuildProvider(capturing))).LogRequest();
+
+        var (filePath, memberName) = FirstCallerFrom(capturing);
+
+        Assert.Equal("OrderService", Path.GetFileNameWithoutExtension(filePath));
+        Assert.Equal("LogRequest", memberName);
+    }
+
+    [Fact]
+    public void GivenATemplateWithFilePathAndMethodPlaceholders_WhenLoggingThroughTheAdapter_ThenTheCallerIsStillReported()
+    {
+        var capturing = new CapturingStateLogger();
+
+        new SampleApp.Orders.OrderService(new MicrosoftLoggerAdapter(BuildProvider(capturing))).LogFile();
+
+        var (filePath, memberName) = FirstCallerFrom(capturing);
+
+        Assert.Equal("OrderService", Path.GetFileNameWithoutExtension(filePath));
+        Assert.Equal("LogFile", memberName);
+    }
+
+    [Fact]
+    public void GivenATemplateWithAMethodPlaceholder_WhenLoggingThroughTheAdapter_ThenThePlaceholderValueIsKept()
+    {
+        var capturing = new CapturingStateLogger();
+
+        new SampleApp.Orders.OrderService(new MicrosoftLoggerAdapter(BuildProvider(capturing))).LogRequest();
+
+        var pairs = ((IEnumerable<KeyValuePair<string, object>>)capturing.Calls.First().State!).ToArray();
+
+        Assert.Contains(pairs, pair => pair is { Key: "Method", Value: "GET" });
+        Assert.Contains(pairs, pair => pair is { Key: "Path", Value: "/orders" });
+    }
 }

@@ -6,7 +6,9 @@
 public enum LogSplitLevel
 {
     /// <summary>
-    /// Split log files per request.
+    /// Do not split by time: every entry goes to one file named after the application, such as
+    /// <c>MyApp.log</c>. Combined with <see cref="LogFolderScheme.ByRequest"/>, the folder, not the file, changes
+    /// per logger instance.
     /// </summary>
     Request = 0,
 
