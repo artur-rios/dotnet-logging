@@ -1,5 +1,7 @@
+using System.Globalization;
 using ArturRios.Logging.Configuration;
 using ArturRios.Logging.Loggers;
+using ArturRios.Logging.Tests.Helpers;
 
 namespace ArturRios.Logging.Tests.Functional;
 
@@ -84,13 +86,19 @@ public sealed class FileLoggerFolderSchemeTests : IDisposable
         LogFolderScheme scheme,
         int expectedDepth)
     {
+        var before = DateTime.UtcNow;
         new FileLogger(Configuration(scheme)).Info("entry", "Caller.cs", "Method");
+        var after = DateTime.UtcNow;
 
         var file = Assert.Single(LogFiles());
         var relative = Path.GetRelativePath(_root, file);
-        var depth = relative.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).Length - 1;
+        var folders = relative.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)[..^1];
 
-        Assert.Equal(expectedDepth, depth);
+        // The folders are the year, month, day and hour, Gregorian and zero-padded, as far as the scheme goes.
+        string[] Expected(DateTime at) => [.. new[] { $"{at.Year}", $"{at.Month:D2}", $"{at.Day:D2}", $"{at.Hour:D2}" }
+            .Take(expectedDepth)];
+        Assert.Equal(expectedDepth, folders.Length);
+        Assert.Contains(new[] { Expected(before), Expected(after) }, expected => expected.SequenceEqual(folders));
     }
 
     [Theory]
@@ -103,27 +111,52 @@ public sealed class FileLoggerFolderSchemeTests : IDisposable
     {
         // The clock is read on both sides of the write, so a write that straddles the turn of an hour (or day, ...)
         // does not fail the test.
+        // Pinned to the owner's culture, so a name that followed the current culture would be caught here too.
+        using var culture = new CultureScope("pt-BR");
         var before = DateTime.UtcNow;
         new FileLogger(Configuration(LogFolderScheme.AllInOne, split)).Info("entry", "Caller.cs", "Method");
         var after = DateTime.UtcNow;
 
         var file = Assert.Single(LogFiles());
 
-        Assert.Contains(Path.GetFileName(file), new[] { string.Format(expected, before), string.Format(expected, after) });
+        Assert.Contains(Path.GetFileName(file), new[]
+        {
+            string.Format(CultureInfo.InvariantCulture, expected, before),
+            string.Format(CultureInfo.InvariantCulture, expected, after)
+        });
+    }
+
+    [Theory]
+    [InlineData("th-TH")] // a Buddhist calendar: its year is 543 ahead of the Gregorian one
+    [InlineData("fa-IR")] // a Persian calendar, with years and months of its own
+    [InlineData("")]
+    public void GivenACultureWithItsOwnCalendar_WhenWriting_ThenTheFileNameIsGregorianLikeItsFolder(string culture)
+    {
+        using var scope = new CultureScope(culture);
+        new FileLogger(Configuration(LogFolderScheme.ByYear, LogSplitLevel.Day)).Info("entry", "Caller.cs", "Method");
+
+        var file = Assert.Single(LogFiles());
+        var stamp = File.ReadAllText(file).Split(" | ")[2];
+        var timestamp = DateTime.Parse(stamp, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+
+        Assert.Equal(
+            Path.Combine(_root, $"{timestamp.Year}", $"TestApp_{timestamp.Year}_{timestamp.Month:D2}_{timestamp.Day:D2}.log"),
+            file);
     }
 
     [Fact]
     public void GivenAnHourlySplit_WhenWriting_ThenTheEntryTimestampFallsInTheFilesPeriod()
     {
+        using var culture = new CultureScope("pt-BR");
         var logger = new FileLogger(Configuration(LogFolderScheme.ByHour, LogSplitLevel.Hour));
 
         logger.Info("entry", "Caller.cs", "Method");
 
         var file = Assert.Single(LogFiles());
         var stamp = File.ReadAllText(file).Split(" | ")[2];
-        var timestamp = DateTime.Parse(stamp, null, System.Globalization.DateTimeStyles.RoundtripKind);
+        var timestamp = DateTime.Parse(stamp, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
 
-        Assert.Equal($"TestApp_{timestamp:yyyy_MM_dd_HH}.log", Path.GetFileName(file));
+        Assert.Equal(string.Create(CultureInfo.InvariantCulture, $"TestApp_{timestamp:yyyy_MM_dd_HH}.log"), Path.GetFileName(file));
         Assert.Equal(timestamp.Hour.ToString("D2"), Path.GetFileName(Path.GetDirectoryName(file)));
     }
 

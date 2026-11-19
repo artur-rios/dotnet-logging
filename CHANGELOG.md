@@ -7,6 +7,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [2.0.3] - 2026-11-19
+
+### Changed
+
+- `ArturRios.Extensions` updated from 1.4.1 to 1.4.2 and `ArturRios.Util` from 2.2.0 to 2.2.1.
+
+### Fixed
+
+- Entries forwarded by `MicrosoftLoggerAdapter` (`ILogger`, `ILogger<T>`) name the class and method that logged
+  them, as in `INFO: OrderService | PlaceOrder | …`. They named the namespace instead of the class
+  (`INFO: MyApp.Orders | PlaceOrder | …`), since the class reached the entry as the last segment of a full type
+  name, which the entry drops as if it were a file extension. From an async method the method was `MoveNext`, and
+  from a lambda a compiler-generated name such as `<PlaceOrder>b__4_0`: the method is now the async method, or the
+  method the lambda or local function is declared in, and a generic class is written without its arity
+  (`Repository`, not ``Repository`1``).
+- A message template with a `{Method}`, `{MemberName}` or `{FilePath}` placeholder no longer replaces the caller
+  of an entry logged through `MicrosoftLoggerAdapter`: `LogInformation("HTTP {Method} {Path}", "GET", "/orders")`,
+  as ASP.NET Core logs every request, reported `GET` as the calling method, and a template with both `{FilePath}`
+  and `{Method}` replaced the class too. In a template's state those names are placeholders, and only
+  `CallerFilePath` and `CallerMemberName` name the caller; a state built by hand still names it under any key
+  `StateLogger` accepts.
+- `FileLogger` names its files with the Gregorian date whatever the current culture. Under a culture with a calendar
+  of its own, such as th-TH, it wrote `2026\App_2569_11_16.log`: the folder had the Gregorian year and the file the
+  Buddhist one, and processes running under different cultures wrote the same day to different files.
+- An empty `FileLoggerConfiguration.FilePath` is the current directory. With the `AllInOne` folder scheme, which
+  leaves a bare file name, every write threw `ArgumentException` instead.
+- `LogEntryFactory.Create` writes a level outside `CustomLogLevel` as its number, as in `42: OrderService | …`. It
+  wrote an empty level name, so the entry started with `: `.
+
 ## [2.0.2] - 2026-11-14
 
 ### Changed
@@ -104,7 +133,8 @@ effect on this library.
 - `StandaloneLogger` and `StateLogger` to use the loggers on their own or as part of a logging state.
 - `MicrosoftLoggerAdapter` and `MicrosoftLoggerProvider` to plug the loggers into `Microsoft.Extensions.Logging`.
 
-[Unreleased]: https://github.com/artur-rios/dotnet-logging/compare/2.0.2...HEAD
+[Unreleased]: https://github.com/artur-rios/dotnet-logging/compare/2.0.3...HEAD
+[2.0.3]: https://github.com/artur-rios/dotnet-logging/compare/2.0.2...2.0.3
 [2.0.2]: https://github.com/artur-rios/dotnet-logging/compare/2.0.1...2.0.2
 [2.0.1]: https://github.com/artur-rios/dotnet-logging/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/artur-rios/dotnet-logging/compare/v1.1.0...2.0.0

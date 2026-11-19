@@ -22,6 +22,7 @@ public class FileLoggerConfiguration : LoggerConfiguration
 
     /// <summary>
     /// Gets or sets the base file path for log files. If null, defaults to a 'log' folder in the application directory.
+    /// A relative path is relative to the current directory, and an empty one is the current directory itself.
     /// </summary>
     public string? FilePath { get; set; }
 }
