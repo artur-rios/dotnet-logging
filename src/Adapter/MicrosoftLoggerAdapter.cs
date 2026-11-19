@@ -83,11 +83,28 @@ public class MicrosoftLoggerAdapter(IServiceProvider services) : ILogger
         }
 
         // Enrich state with caller info if not present so StateLogger.ResolveCallerInfo can pick it up.
+        // A message template's state (ILogger.LogInformation("HTTP {Method} {Path}", …) and LoggerMessage
+        // alike) carries the template under {OriginalFormat}, and its other keys are the placeholders' values:
+        // a {Method} or {FilePath} there is data, not the caller. For such a state only CallerFilePath and
+        // CallerMemberName count as caller information, and the caller's keys go first, since StateLogger takes
+        // the first key that names each part. A state built by hand names the caller under any key StateLogger
+        // accepts, and keeps its order.
         object? enrichedState = state;
-        if (!StateContainsCallerInfo(state))
+        var isTemplate = IsMessageTemplateState(state);
+        if (!StateContainsCallerInfo(state, isTemplate))
         {
             var (filePath, memberName) = FindCallerFromStack();
+            KeyValuePair<string, object>[] caller =
+            [
+                new("CallerFilePath", filePath),
+                new("CallerMemberName", memberName)
+            ];
             var kvList = new List<KeyValuePair<string, object>>();
+
+            if (isTemplate)
+            {
+                kvList.AddRange(caller);
+            }
 
             if (state is IEnumerable<KeyValuePair<string, object>> existingPairs)
             {
@@ -97,8 +114,11 @@ public class MicrosoftLoggerAdapter(IServiceProvider services) : ILogger
                 }
             }
 
-            kvList.Add(new KeyValuePair<string, object>("CallerFilePath", filePath));
-            kvList.Add(new KeyValuePair<string, object>("CallerMemberName", memberName));
+            if (!isTemplate)
+            {
+                kvList.AddRange(caller);
+            }
+
             kvList.Add(new KeyValuePair<string, object>("OriginalMessage", message));
 
             enrichedState = kvList.ToArray();
@@ -163,7 +183,13 @@ public class MicrosoftLoggerAdapter(IServiceProvider services) : ILogger
         }
     }
 
-    private static bool StateContainsCallerInfo(object? state)
+    private const string OriginalFormatKey = "{OriginalFormat}";
+
+    private static bool IsMessageTemplateState(object? state) =>
+        state is IEnumerable<KeyValuePair<string, object?>> pairs &&
+        pairs.Any(pair => string.Equals(pair.Key, OriginalFormatKey, StringComparison.Ordinal));
+
+    private static bool StateContainsCallerInfo(object? state, bool isTemplate)
     {
         if (state is not IEnumerable<KeyValuePair<string, object?>> pairs)
         {
@@ -180,16 +206,14 @@ public class MicrosoftLoggerAdapter(IServiceProvider services) : ILogger
             }
 
             if (!hasFile && (string.Equals(k, "CallerFilePath", StringComparison.OrdinalIgnoreCase) ||
-                             string.Equals(k, "FilePath", StringComparison.OrdinalIgnoreCase) ||
-                             string.Equals(k, "callerFilePath", StringComparison.OrdinalIgnoreCase)))
+                             (!isTemplate && string.Equals(k, "FilePath", StringComparison.OrdinalIgnoreCase))))
             {
                 hasFile = true;
             }
 
             if (!hasMember && (string.Equals(k, "CallerMemberName", StringComparison.OrdinalIgnoreCase) ||
-                               string.Equals(k, "MemberName", StringComparison.OrdinalIgnoreCase) ||
-                               string.Equals(k, "Method", StringComparison.OrdinalIgnoreCase) ||
-                               string.Equals(k, "callerMemberName", StringComparison.OrdinalIgnoreCase)))
+                               (!isTemplate && (string.Equals(k, "MemberName", StringComparison.OrdinalIgnoreCase) ||
+                                                string.Equals(k, "Method", StringComparison.OrdinalIgnoreCase)))))
             {
                 hasMember = true;
             }
@@ -231,10 +255,7 @@ public class MicrosoftLoggerAdapter(IServiceProvider services) : ILogger
                     continue;
                 }
 
-                var memberName = method.Name;
-                var filePath = declaring.FullName ?? declaring.Name;
-
-                return (filePath, memberName);
+                return SourceCaller(declaring, method.Name);
             }
         }
         catch
@@ -243,6 +264,55 @@ public class MicrosoftLoggerAdapter(IServiceProvider services) : ILogger
         }
 
         return ("unknown", "unknown");
+    }
+
+    /// <summary>
+    /// The class and method a frame belongs to in the source, in the shape <c>[CallerFilePath]</c> and
+    /// <c>[CallerMemberName]</c> give them. The entry's class is the file path's name without its extension,
+    /// so the class goes in as a bare name: a full name such as <c>MyApp.Orders.OrderService</c> would lose
+    /// its last segment, the class, as an "extension".
+    /// </summary>
+    /// <remarks>
+    /// The compiler moves an async method or iterator into a nested state machine (<c>&lt;PlaceAsync&gt;d__3</c>,
+    /// whose method is <c>MoveNext</c>), a lambda into a closure class or a method named
+    /// <c>&lt;Place&gt;b__0_0</c>, and a local function into <c>&lt;Place&gt;g__Local|0_0</c>. The source method
+    /// is the name between the angle brackets, and the class is the first type out from them that the source
+    /// declared.
+    /// </remarks>
+    private static (string filePath, string memberName) SourceCaller(Type declaring, string memberName)
+    {
+        var type = declaring;
+
+        while (IsCompilerGenerated(type) && type.DeclaringType is { } outer)
+        {
+            if (memberName is "MoveNext" or "SetStateMachine" or "MoveNextAsync" or "DisposeAsync" &&
+                SourceName(type.Name) is { } stateMachineOwner)
+            {
+                memberName = stateMachineOwner;
+            }
+
+            type = outer;
+        }
+
+        memberName = SourceName(memberName) ?? memberName;
+
+        var className = type.Name;
+        var arity = className.IndexOf('`');
+
+        return (arity > 0 ? className[..arity] : className, memberName);
+    }
+
+    private static bool IsCompilerGenerated(Type type) => type.Name.StartsWith('<');
+
+    /// <summary>The name inside a compiler-generated <c>&lt;Name&gt;…</c>, or <c>null</c> for any other name.</summary>
+    private static string? SourceName(string name)
+    {
+        if (!name.StartsWith('<'))
+            return null;
+
+        var close = name.IndexOf('>');
+
+        return close > 1 ? name[1..close] : null;
     }
 
     private class NullScope : IDisposable
